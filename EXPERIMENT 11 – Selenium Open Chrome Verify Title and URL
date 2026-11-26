@@ -1,0 +1,49 @@
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+/*
+ * Experiment 11 - Open Chrome using Selenium WebDriver and verify the title
+ * and URL of a web page (Selenium)
+ * Dependencies: selenium-java 4.x, junit-jupiter 5.x (Selenium Manager downloads chromedriver)
+ */
+public class OpenChromeTest {
+
+    WebDriver driver;
+    final String URL = "https://the-internet.herokuapp.com/";
+
+    @BeforeEach
+    void setUp() {
+        driver = new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.get(URL);
+    }
+
+    @Test
+    void verifyTitle() {
+        String title = driver.getTitle();
+        System.out.println("Page title: " + title);
+        assertEquals("The Internet", title);
+    }
+
+    @Test
+    void verifyUrl() {
+        String currentUrl = driver.getCurrentUrl();
+        System.out.println("Current URL: " + currentUrl);
+        assertEquals(URL, currentUrl);
+    }
+
+    @Test
+    void verifyUrlAfterNavigation() {
+        driver.navigate().to(URL + "login");
+        assertTrue(driver.getCurrentUrl().endsWith("/login"));
+        driver.navigate().back();
+        assertEquals(URL, driver.getCurrentUrl());
+    }
+
+    @AfterEach
+    void tearDown() {
+        driver.quit();
+    }
+}

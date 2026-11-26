@@ -1,0 +1,53 @@
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+/*
+ * Experiment 30 - Achieve branch coverage on a program that finds the largest
+ * of three numbers using JUnit (JUnit)
+ * Each decision is made both TRUE and FALSE at least once.
+ */
+class Largest {
+    static int largest(int a, int b, int c) {
+        if (a >= b) {            // D1
+            if (a >= c) {        // D2
+                return a;
+            } else {
+                return c;
+            }
+        } else {
+            if (b >= c) {        // D3
+                return b;
+            } else {
+                return c;
+            }
+        }
+    }
+}
+
+public class LargestBranchCoverageTest {
+
+    @Test
+    void d1True_d2True_aIsLargest() {
+        assertEquals(9, Largest.largest(9, 4, 2));
+    }
+
+    @Test
+    void d1True_d2False_cIsLargest() {
+        assertEquals(10, Largest.largest(7, 3, 10));
+    }
+
+    @Test
+    void d1False_d3True_bIsLargest() {
+        assertEquals(8, Largest.largest(2, 8, 5));
+    }
+
+    @Test
+    void d1False_d3False_cIsLargest() {
+        assertEquals(6, Largest.largest(1, 4, 6));
+    }
+
+    @Test
+    void allEqual() {
+        assertEquals(5, Largest.largest(5, 5, 5));
+    }
+}

@@ -1,0 +1,60 @@
+import org.junit.jupiter.api.*;
+import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
+import static org.junit.jupiter.api.Assertions.*;
+
+/*
+ * Experiment 35 - Handle JavaScript alert, confirm and prompt pop-ups
+ * using Selenium WebDriver (Selenium)
+ */
+public class AlertsTest {
+
+    WebDriver driver;
+
+    @BeforeEach
+    void setUp() {
+        driver = new ChromeDriver();
+        driver.get("https://the-internet.herokuapp.com/javascript_alerts");
+    }
+
+    String result() {
+        return driver.findElement(By.id("result")).getText();
+    }
+
+    @Test
+    void handleSimpleAlert() {
+        driver.findElement(By.xpath("//button[text()='Click for JS Alert']")).click();
+        Alert alert = driver.switchTo().alert();
+        assertEquals("I am a JS Alert", alert.getText());
+        alert.accept();
+        assertEquals("You successfully clicked an alert", result());
+    }
+
+    @Test
+    void acceptConfirm() {
+        driver.findElement(By.xpath("//button[text()='Click for JS Confirm']")).click();
+        driver.switchTo().alert().accept();
+        assertEquals("You clicked: Ok", result());
+    }
+
+    @Test
+    void dismissConfirm() {
+        driver.findElement(By.xpath("//button[text()='Click for JS Confirm']")).click();
+        driver.switchTo().alert().dismiss();
+        assertEquals("You clicked: Cancel", result());
+    }
+
+    @Test
+    void enterTextInPrompt() {
+        driver.findElement(By.xpath("//button[text()='Click for JS Prompt']")).click();
+        Alert prompt = driver.switchTo().alert();
+        prompt.sendKeys("Selenium");
+        prompt.accept();
+        assertEquals("You entered: Selenium", result());
+    }
+
+    @AfterEach
+    void tearDown() {
+        driver.quit();
+    }
+}

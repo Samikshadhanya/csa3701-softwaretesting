@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Experiment 60 - API testing of a weather information service
+     Create test cases for API testing of a weather information service using JMeter (Open-Meteo, no API key).
+     Run: jmeter -n -t "<this file>.jmx" -l results.jtl -e -o report -->
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
+<hashTree>
+<TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Experiment 60 - API testing of a weather information service" enabled="true">
+<stringProp name="TestPlan.comments">Create test cases for API testing of a weather information service using JMeter (Open-Meteo, no API key).</stringProp>
+<boolProp name="TestPlan.functional_mode">false</boolProp>
+<boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+<elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+<collectionProp name="Arguments.arguments">
+</collectionProp>
+</elementProp>
+</TestPlan>
+<hashTree>
+<ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP Request Defaults" enabled="true">
+<elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+<collectionProp name="Arguments.arguments"/>
+</elementProp>
+<stringProp name="HTTPSampler.domain">api.open-meteo.com</stringProp>
+<stringProp name="HTTPSampler.protocol">https</stringProp>
+<stringProp name="HTTPSampler.connect_timeout">5000</stringProp>
+<stringProp name="HTTPSampler.response_timeout">10000</stringProp>
+</ConfigTestElement>
+<hashTree>
+</hashTree>
+<HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+<collectionProp name="HeaderManager.headers">
+<elementProp name="" elementType="Header">
+<stringProp name="Header.name">Accept</stringProp>
+<stringProp name="Header.value">application/json</stringProp>
+</elementProp>
+</collectionProp>
+</HeaderManager>
+<hashTree>
+</hashTree>
+<ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Weather API Tests" enabled="true">
+<stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+<elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+<boolProp name="LoopController.continue_forever">false</boolProp>
+<stringProp name="LoopController.loops">1</stringProp>
+</elementProp>
+<stringProp name="ThreadGroup.num_threads">1</stringProp>
+<stringProp name="ThreadGroup.ramp_time">1</stringProp>
+<boolProp name="ThreadGroup.scheduler">false</boolProp>
+</ThreadGroup>
+<hashTree>
+<HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="TC01 Current weather Chennai" enabled="true">
+<elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+<collectionProp name="Arguments.arguments">
+<elementProp name="latitude" elementType="HTTPArgument">
+<boolProp name="HTTPArgument.always_encode">true</boolProp>
+<stringProp name="Argument.name">latitude</stringProp>
+<stringProp name="Argument.value">13.08</stringProp>
+<stringProp name="Argument.metadata">=</stringProp>
+<boolProp name="HTTPArgument.use_equals">true</boolProp>
+</elementProp>
+<elementProp name="longitude" elementType="HTTPArgument">
+<boolProp name="HTTPArgument.always_encode">true</boolProp>
+<stringProp name="Argument.name">longitude</stringProp>
+<stringProp name="Argument.value">80.27</stringProp>
+<stringProp name="Argument.metadata">=</stringProp>
+<boolProp name="HTTPArgument.use_equals">true</boolProp>
+</elementProp>
+<elementProp name="current_weather" elementType="HTTPArgument">
+<boolProp name="HTTPArgument.always_encode">true</boolProp>
+<stringProp name="Argument.name">current_weather</stringProp>
+<stringProp name="Argument.value">true</stringProp>
+<stringProp name="Argument.metadata">=</stringProp>
+<boolProp name="HTTPArgument.use_equals">true</boolProp>
+</elementProp>
+</collectionProp>
+</elementProp>
+<stringProp name="HTTPSampler.domain"></stringProp>
+<stringProp name="HTTPSampler.protocol"></stringProp>
+<stringProp name="HTTPSampler.path">/v1/forecast</stringProp>
+<stringProp name="HTTPSampler.method">GET</stringProp>
+<boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+<boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+</HTTPSamplerProxy>
+<hashTree>
+<ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assert Status 200" enabled="true">
+<collectionProp name="Asserion.test_strings">
+<stringProp name="49586">200</stringProp>
+</collectionProp>
+<stringProp name="Assertion.custom_message"></stringProp>
+<stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+<boolProp name="Assertion.assume_success">false</boolProp>
+<intProp name="Assertion.test_type">8</intProp>
+</ResponseAssertion>
+<hashTree>
+</hashTree>
+<JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="JSON Assertion $.current_weather.temperature" enabled="true">
+<stringProp name="JSON_PATH">$.current_weather.temperature</stringProp>
+<stringProp name="EXPECTED_VALUE"></stringProp>
+<boolProp name="JSONVALIDATION">false</boolProp>
+<boolProp name="EXPECT_NULL">false</boolProp>
+<boolProp name="INVERT">false</boolProp>
+<boolProp name="ISREGEX">false</boolProp>
+</JSONPathAssertion>
+<hashTree>
+</hashTree>
+<JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="JSON Assertion $.current_weather.windspeed" enabled="true">
+<stringProp name="JSON_PATH">$.current_weather.windspeed</stringProp>
+<stringProp name="EXPECTED_VALUE"></stringProp>
+<boolProp name="JSONVALIDATION">false</boolProp>
+<boolProp name="EXPECT_NULL">false</boolProp>
+<boolProp name="INVERT">false</boolProp>
+<boolProp name="ISREGEX">false</boolProp>
+</JSONPathAssertion>
+<hashTree>
+</hashTree>
+<DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="Response Time &lt; 3000 ms" enabled="true">
+<stringProp name="DurationAssertion.duration">3000</stringProp>
+</DurationAssertion>
+<hashTree>
+</hashTree>
+</hashTree>
+<HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="TC02 Hourly temperature" enabled="true">
+<elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+<collectionProp name="Arguments.arguments">
+<elementProp name="latitude" elementType="HTTPArgument">
+<boolProp name="HTTPArgument.always_encode">true</boolProp>
+<stringProp name="Argument.name">latitude</stringProp>
+<stringProp name="Argument.value">28.61</stringProp>
+<stringProp name="Argument.metadata">=</stringProp>
+<boolProp name="HTTPArgument.use_equals">true</boolProp>
+</elementProp>
+<elementProp name="longitude" elementType="HTTPArgument">
+<boolProp name="HTTPArgument.always_encode">true</boolProp>
+<stringProp name="Argument.name">longitude</stringProp>
+<stringProp name="Argument.value">77.21</stringProp>
+<stringProp name="Argument.metadata">=</stringProp>
+<boolProp name="HTTPArgument.use_equals">true</boolProp>
+</elementProp>
+<elementProp name="hourly" elementType="HTTPArgument">
+<boolProp name="HTTPArgument.always_encode">true</boolProp>
+<stringProp name="Argument.name">hourly</stringProp>
+<stringProp name="Argument.value">temperature_2m</stringProp>
+<stringProp name="Argument.metadata">=</stringProp>
+<boolProp name="HTTPArgument.use_equals">true</boolProp>
+</elementProp>
+</collectionProp>
+</elementProp>
+<stringProp name="HTTPSampler.domain"></stringProp>
+<stringProp name="HTTPSampler.protocol"></stringProp>
+<stringProp name="HTTPSampler.path">/v1/forecast</stringProp>
+<stringProp name="HTTPSampler.method">GET</stringProp>
+<boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+<boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+</HTTPSamplerProxy>
+<hashTree>
+<ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assert Status 200" enabled="true">
+<collectionProp name="Asserion.test_strings">
+<stringProp name="49586">200</stringProp>
+</collectionProp>
+<stringProp name="Assertion.custom_message"></stringProp>
+<stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+<boolProp name="Assertion.assume_success">false</boolProp>
+<intProp name="Assertion.test_type">8</intProp>
+</ResponseAssertion>
+<hashTree>
+</hashTree>
+<JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="JSON Assertion $.hourly.temperature_2m" enabled="true">
+<stringProp name="JSON_PATH">$.hourly.temperature_2m</stringProp>
+<stringProp name="EXPECTED_VALUE"></stringProp>
+<boolProp name="JSONVALIDATION">false</boolProp>
+<boolProp name="EXPECT_NULL">false</boolProp>
+<boolProp name="INVERT">false</boolProp>
+<boolProp name="ISREGEX">false</boolProp>
+</JSONPathAssertion>
+<hashTree>
+</hashTree>
+<JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="JSON Assertion $.hourly_units.temperature_2m" enabled="true">
+<stringProp name="JSON_PATH">$.hourly_units.temperature_2m</stringProp>
+<stringProp name="EXPECTED_VALUE">°C</stringProp>
+<boolProp name="JSONVALIDATION">true</boolProp>
+<boolProp name="EXPECT_NULL">false</boolProp>
+<boolProp name="INVERT">false</boolProp>
+<boolProp name="ISREGEX">false</boolProp>
+</JSONPathAssertion>
+<hashTree>
+</hashTree>
+</hashTree>
+<HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="TC03 Daily forecast with timezone" enabled="true">
+<elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+<collectionProp name="Arguments.arguments">
+<elementProp name="latitude" elementType="HTTPArgument">
+<boolProp name="HTTPArgument.always_encode">true</boolProp>
+<stringProp name="Argument.name">latitude</stringProp>
+<stringProp name="Argument.value">19.07</stringProp>
+<stringProp name="Argument.metadata">=</stringProp>
+<boolProp name="HTTPArgument.use_equals">true</boolProp>
+</elementProp>
+<elementProp name="longitude" elementType="HTTPArgument">
+<boolProp name="HTTPArgument.always_encode">true</boolProp>
+<stringProp name="Argument.name">longitude</stringProp>
+<stringProp name="Argument.value">72.88</stringProp>
+<stringProp name="Argument.metadata">=</stringProp>
+<boolProp name="HTTPArgument.use_equals">true</boolProp>
+</elementProp>
+<elementProp name="daily" elementType="HTTPArgument">
+<boolProp name="HTTPArgument.always_encode">true</boolProp>
+<stringProp name="Argument.name">daily</stringProp>
+<stringProp name="Argument.value">temperature_2m_max,temperature_2m_min</stringProp>
+<stringProp name="Argument.metadata">=</stringProp>
+<boolProp name="HTTPArgument.use_equals">true</boolProp>
+</elementProp>
+<elementProp name="timezone" elementType="HTTPArgument">
+<boolProp name="HTTPArgument.always_encode">true</boolProp>
+<stringProp name="Argument.name">timezone</stringProp>
+<stringProp name="Argument.value">Asia/Kolkata</stringProp>
+<stringProp name="Argument.metadata">=</stringProp>
+<boolProp name="HTTPArgument.use_equals">true</boolProp>
+</elementProp>
+</collectionProp>
+</elementProp>
+<stringProp name="HTTPSampler.domain"></stringProp>
+<stringProp name="HTTPSampler.protocol"></stringProp>
+<stringProp name="HTTPSampler.path">/v1/forecast</stringProp>
+<stringProp name="HTTPSampler.method">GET</stringProp>
+<boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+<boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+</HTTPSamplerProxy>
+<hashTree>
+<ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assert Status 200" enabled="true">
+<collectionProp name="Asserion.test_strings">
+<stringProp name="49586">200</stringProp>
+</collectionProp>
+<stringProp name="Assertion.custom_message"></stringProp>
+<stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+<boolProp name="Assertion.assume_success">false</boolProp>
+<intProp name="Assertion.test_type">8</intProp>
+</ResponseAssertion>
+<hashTree>
+</hashTree>
+<JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="JSON Assertion $.timezone" enabled="true">
+<stringProp name="JSON_PATH">$.timezone</stringProp>
+<stringProp name="EXPECTED_VALUE">Asia/Kolkata</stringProp>
+<boolProp name="JSONVALIDATION">true</boolProp>
+<boolProp name="EXPECT_NULL">false</boolProp>
+<boolProp name="INVERT">false</boolProp>
+<boolProp name="ISREGEX">false</boolProp>
+</JSONPathAssertion>
+<hashTree>
+</hashTree>
+</hashTree>
+<HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="TC04 Invalid latitude - 400" enabled="true">
+<elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+<collectionProp name="Arguments.arguments">
+<elementProp name="latitude" elementType="HTTPArgument">
+<boolProp name="HTTPArgument.always_encode">true</boolProp>
+<stringProp name="Argument.name">latitude</stringProp>
+<stringProp name="Argument.value">200</stringProp>
+<stringProp name="Argument.metadata">=</stringProp>
+<boolProp name="HTTPArgument.use_equals">true</boolProp>
+</elementProp>
+<elementProp name="longitude" elementType="HTTPArgument">
+<boolProp name="HTTPArgument.always_encode">true</boolProp>
+<stringProp name="Argument.name">longitude</stringProp>
+<stringProp name="Argument.value">80.27</stringProp>
+<stringProp name="Argument.metadata">=</stringProp>
+<boolProp name="HTTPArgument.use_equals">true</boolProp>
+</elementProp>
+<elementProp name="current_weather" elementType="HTTPArgument">
+<boolProp name="HTTPArgument.always_encode">true</boolProp>
+<stringProp name="Argument.name">current_weather</stringProp>
+<stringProp name="Argument.value">true</stringProp>
+<stringProp name="Argument.metadata">=</stringProp>
+<boolProp name="HTTPArgument.use_equals">true</boolProp>
+</elementProp>
+</collectionProp>
+</elementProp>
+<stringProp name="HTTPSampler.domain"></stringProp>
+<stringProp name="HTTPSampler.protocol"></stringProp>
+<stringProp name="HTTPSampler.path">/v1/forecast</stringProp>
+<stringProp name="HTTPSampler.method">GET</stringProp>
+<boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+<boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+</HTTPSamplerProxy>
+<hashTree>
+<ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assert Status 400" enabled="true">
+<collectionProp name="Asserion.test_strings">
+<stringProp name="49586">400</stringProp>
+</collectionProp>
+<stringProp name="Assertion.custom_message"></stringProp>
+<stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+<boolProp name="Assertion.assume_success">false</boolProp>
+<intProp name="Assertion.test_type">8</intProp>
+</ResponseAssertion>
+<hashTree>
+</hashTree>
+<JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="JSON Assertion $.error" enabled="true">
+<stringProp name="JSON_PATH">$.error</stringProp>
+<stringProp name="EXPECTED_VALUE">true</stringProp>
+<boolProp name="JSONVALIDATION">true</boolProp>
+<boolProp name="EXPECT_NULL">false</boolProp>
+<boolProp name="INVERT">false</boolProp>
+<boolProp name="ISREGEX">false</boolProp>
+</JSONPathAssertion>
+<hashTree>
+</hashTree>
+</hashTree>
+<HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="TC05 Missing parameters - 400" enabled="true">
+<elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+<collectionProp name="Arguments.arguments">
+</collectionProp>
+</elementProp>
+<stringProp name="HTTPSampler.domain"></stringProp>
+<stringProp name="HTTPSampler.protocol"></stringProp>
+<stringProp name="HTTPSampler.path">/v1/forecast</stringProp>
+<stringProp name="HTTPSampler.method">GET</stringProp>
+<boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+<boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+</HTTPSamplerProxy>
+<hashTree>
+<ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assert Status 400" enabled="true">
+<collectionProp name="Asserion.test_strings">
+<stringProp name="49586">400</stringProp>
+</collectionProp>
+<stringProp name="Assertion.custom_message"></stringProp>
+<stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+<boolProp name="Assertion.assume_success">false</boolProp>
+<intProp name="Assertion.test_type">8</intProp>
+</ResponseAssertion>
+<hashTree>
+</hashTree>
+</hashTree>
+</hashTree>
+<ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
+<boolProp name="ResultCollector.error_logging">false</boolProp>
+<objProp>
+<name>saveConfig</name>
+<value class="SampleSaveConfiguration">
+<time>true</time><latency>true</latency><timestamp>true</timestamp><success>true</success>
+<label>true</label><code>true</code><message>true</message><threadName>true</threadName>
+<dataType>true</dataType><encoding>false</encoding><assertions>true</assertions>
+<subresults>true</subresults><responseData>false</responseData><samplerData>false</samplerData>
+<xml>false</xml><fieldNames>true</fieldNames><responseHeaders>false</responseHeaders>
+<requestHeaders>false</requestHeaders><responseDataOnError>false</responseDataOnError>
+<saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+<assertionsResultsToSave>0</assertionsResultsToSave><bytes>true</bytes>
+<sentBytes>true</sentBytes><url>true</url><threadCounts>true</threadCounts>
+<idleTime>true</idleTime><connectTime>true</connectTime>
+</value>
+</objProp>
+<stringProp name="filename"></stringProp>
+</ResultCollector>
+<hashTree>
+</hashTree>
+<ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table" enabled="true">
+<boolProp name="ResultCollector.error_logging">false</boolProp>
+<objProp>
+<name>saveConfig</name>
+<value class="SampleSaveConfiguration">
+<time>true</time><latency>true</latency><timestamp>true</timestamp><success>true</success>
+<label>true</label><code>true</code><message>true</message><threadName>true</threadName>
+<dataType>true</dataType><encoding>false</encoding><assertions>true</assertions>
+<subresults>true</subresults><responseData>false</responseData><samplerData>false</samplerData>
+<xml>false</xml><fieldNames>true</fieldNames><responseHeaders>false</responseHeaders>
+<requestHeaders>false</requestHeaders><responseDataOnError>false</responseDataOnError>
+<saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+<assertionsResultsToSave>0</assertionsResultsToSave><bytes>true</bytes>
+<sentBytes>true</sentBytes><url>true</url><threadCounts>true</threadCounts>
+<idleTime>true</idleTime><connectTime>true</connectTime>
+</value>
+</objProp>
+<stringProp name="filename"></stringProp>
+</ResultCollector>
+<hashTree>
+</hashTree>
+</hashTree>
+</hashTree>
+</jmeterTestPlan>

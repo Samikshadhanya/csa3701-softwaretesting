@@ -1,0 +1,49 @@
+import org.junit.jupiter.api.*;
+import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
+import static org.junit.jupiter.api.Assertions.*;
+
+/*
+ * Experiment 14 - Automate checkbox and radio button selection
+ * using Selenium WebDriver (Selenium)
+ */
+public class CheckboxRadioTest {
+
+    WebDriver driver;
+
+    @BeforeEach
+    void setUp() {
+        driver = new ChromeDriver();
+        driver.get("https://www.selenium.dev/selenium/web/web-form.html");
+    }
+
+    @Test
+    void selectAndDeselectCheckbox() {
+        WebElement check1 = driver.findElement(By.id("my-check-1"));
+        WebElement check2 = driver.findElement(By.id("my-check-2"));
+
+        assertTrue(check1.isSelected());      // checked by default
+        check1.click();
+        assertFalse(check1.isSelected());
+
+        assertFalse(check2.isSelected());
+        check2.click();
+        assertTrue(check2.isSelected());
+    }
+
+    @Test
+    void selectRadioButton() {
+        WebElement radio1 = driver.findElement(By.id("my-radio-1"));
+        WebElement radio2 = driver.findElement(By.id("my-radio-2"));
+
+        assertTrue(radio1.isSelected());
+        radio2.click();
+        assertTrue(radio2.isSelected());
+        assertFalse(radio1.isSelected());     // only one radio in a group
+    }
+
+    @AfterEach
+    void tearDown() {
+        driver.quit();
+    }
+}

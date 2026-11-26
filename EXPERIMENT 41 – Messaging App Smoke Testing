@@ -1,0 +1,52 @@
+import java.util.*;
+
+/*
+ * Experiment 41 - Execute smoke testing on a new version of a messaging application (Manual)
+ * Smoke testing checks only the critical features of a new build; if any fails,
+ * the build is rejected before detailed testing.
+ */
+public class MessagingSmokeTest {
+
+    // ---- Messaging application (build v2.0) ----
+    static class MessagingApp {
+        Set<String> users = new HashSet<>();
+        String loggedIn;
+        Map<String, List<String>> inbox = new HashMap<>();
+
+        boolean launch() { return true; }
+        boolean register(String u) { inbox.put(u, new ArrayList<>()); return users.add(u); }
+        boolean login(String u) { if (users.contains(u)) { loggedIn = u; return true; } return false; }
+        boolean send(String to, String msg) {
+            if (loggedIn == null || !users.contains(to) || msg.isEmpty()) return false;
+            inbox.get(to).add(loggedIn + ": " + msg);
+            return true;
+        }
+        List<String> read(String u) { return inbox.get(u); }
+        boolean logout() { loggedIn = null; return true; }
+    }
+
+    static int pass = 0, total = 0;
+
+    static void check(String name, boolean result) {
+        total++;
+        if (result) pass++;
+        System.out.printf("%-35s %s%n", name, result ? "PASS" : "FAIL");
+    }
+
+    public static void main(String[] args) {
+        System.out.println("SMOKE TEST - MESSAGING APP BUILD v2.0\n");
+        MessagingApp app = new MessagingApp();
+
+        check("ST01 Application launches", app.launch());
+        check("ST02 User registration", app.register("alice") && app.register("bob"));
+        check("ST03 Login with valid user", app.login("alice"));
+        check("ST04 Send a text message", app.send("bob", "Hello Bob"));
+        check("ST05 Message received in inbox", app.read("bob").contains("alice: Hello Bob"));
+        check("ST06 Logout", app.logout());
+        check("ST07 Cannot send after logout", !app.send("bob", "Hi"));
+
+        System.out.println("\nPassed " + pass + "/" + total);
+        System.out.println(pass == total ? "BUILD ACCEPTED for detailed testing"
+                                         : "BUILD REJECTED - critical feature broken");
+    }
+}

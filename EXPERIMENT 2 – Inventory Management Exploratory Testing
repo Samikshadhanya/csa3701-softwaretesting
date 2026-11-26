@@ -1,0 +1,48 @@
+import java.util.*;
+
+/*
+ * Experiment 2 - Perform exploratory testing on a simple inventory management system (Manual)
+ * The tester explores the system with charters and records observations in a session log.
+ */
+public class InventoryExploratoryTest {
+
+    static Map<String, Integer> stock = new HashMap<>();
+
+    static String addItem(String name, int qty) {
+        if (name == null || name.trim().isEmpty()) return "Error: empty name";
+        stock.put(name, stock.getOrDefault(name, 0) + qty);   // accepts negative qty (bug)
+        return "Added " + qty + " " + name;
+    }
+
+    static String removeItem(String name, int qty) {
+        if (!stock.containsKey(name)) return "Error: item not found";
+        stock.put(name, stock.get(name) - qty);                // stock can go negative (bug)
+        return "Removed " + qty + " " + name;
+    }
+
+    static String search(String name) {
+        return stock.containsKey(name) ? name + " : " + stock.get(name) : "Not found"; // case-sensitive (bug)
+    }
+
+    public static void main(String[] args) {
+        System.out.println("EXPLORATORY TESTING SESSION - INVENTORY SYSTEM");
+        System.out.println("Charter: Explore add / remove / search with valid and unusual inputs\n");
+
+        String[][] session = {
+            {"Add 10 Pens", addItem("Pen", 10), "Works as expected"},
+            {"Add empty name", addItem("", 5), "Validated correctly"},
+            {"Add -5 Pens", addItem("Pen", -5), "BUG: negative quantity accepted"},
+            {"Remove 20 Pens (only 5)", removeItem("Pen", 20), "BUG: stock became " + stock.get("Pen")},
+            {"Remove unknown item", removeItem("Laptop", 1), "Validated correctly"},
+            {"Search 'pen' lowercase", search("pen"), "BUG: search is case-sensitive"},
+            {"Search 'Pen'", search("Pen"), "Shows negative stock"}
+        };
+
+        System.out.printf("%-3s %-26s %-22s %-35s%n", "No", "Action", "Result", "Observation");
+        int i = 1;
+        for (String[] s : session)
+            System.out.printf("%-3d %-26s %-22s %-35s%n", i++, s[0], s[1], s[2]);
+
+        System.out.println("\nSummary: 7 tests explored, 3 defects found.");
+    }
+}

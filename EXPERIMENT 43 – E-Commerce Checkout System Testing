@@ -1,0 +1,63 @@
+import java.util.*;
+
+/*
+ * Experiment 43 - Create test scenarios for an e-commerce checkout process
+ * for system testing (Manual)
+ */
+public class CheckoutSystemTest {
+
+    static class Checkout {
+        Map<String, Integer> cart = new LinkedHashMap<>();
+        Map<String, Integer> prices = Map.of("Phone", 15000, "Case", 500, "Charger", 1200);
+        Map<String, Integer> stock = new HashMap<>(Map.of("Phone", 2, "Case", 10, "Charger", 0));
+        String address;
+
+        String add(String item, int qty) {
+            if (!prices.containsKey(item)) return "Item not found";
+            if (qty <= 0) return "Invalid quantity";
+            if (stock.get(item) < qty) return "Out of stock";
+            cart.merge(item, qty, Integer::sum);
+            return "Added";
+        }
+        int total(String coupon) {
+            int t = 0;
+            for (Map.Entry<String, Integer> e : cart.entrySet()) t += prices.get(e.getKey()) * e.getValue();
+            if ("SAVE10".equals(coupon)) t -= t / 10;
+            if (t > 0 && t < 1000) t += 50;            // delivery charge
+            return t;
+        }
+        String placeOrder(String addr, String payment) {
+            if (cart.isEmpty()) return "Cart is empty";
+            if (addr == null || addr.isBlank()) return "Address required";
+            if (!List.of("CARD", "UPI", "COD").contains(payment)) return "Invalid payment";
+            for (Map.Entry<String, Integer> e : cart.entrySet()) stock.merge(e.getKey(), -e.getValue(), Integer::sum);
+            cart.clear();
+            return "Order placed";
+        }
+    }
+
+    public static void main(String[] args) {
+        System.out.println("E-COMMERCE CHECKOUT - SYSTEM TEST SCENARIOS\n");
+        System.out.printf("%-6s %-42s %-16s %-16s %-6s%n", "ID", "Scenario", "Expected", "Actual", "Result");
+
+        Checkout c = new Checkout();
+        row("TS01", "Place order with empty cart", "Cart is empty", c.placeOrder("Chennai", "UPI"));
+        row("TS02", "Add available item to cart", "Added", c.add("Phone", 1));
+        row("TS03", "Add item with zero quantity", "Invalid quantity", c.add("Case", 0));
+        row("TS04", "Add out-of-stock item", "Out of stock", c.add("Charger", 1));
+        row("TS05", "Add item not in catalogue", "Item not found", c.add("Laptop", 1));
+        row("TS06", "Total without coupon", "15000", String.valueOf(c.total(null)));
+        row("TS07", "Total with SAVE10 coupon", "13500", String.valueOf(c.total("SAVE10")));
+        row("TS08", "Checkout without address", "Address required", c.placeOrder("", "CARD"));
+        row("TS09", "Checkout with invalid payment", "Invalid payment", c.placeOrder("Chennai", "CASH"));
+        row("TS10", "Checkout with valid details", "Order placed", c.placeOrder("Chennai", "UPI"));
+        row("TS11", "Stock reduced after order", "1", String.valueOf(c.stock.get("Phone")));
+        Checkout small = new Checkout();
+        small.add("Case", 1);
+        row("TS12", "Delivery charge below Rs.1000", "550", String.valueOf(small.total(null)));
+    }
+
+    static void row(String id, String sc, String exp, String act) {
+        System.out.printf("%-6s %-42s %-16s %-16s %-6s%n", id, sc, exp, act, exp.equals(act) ? "PASS" : "FAIL");
+    }
+}

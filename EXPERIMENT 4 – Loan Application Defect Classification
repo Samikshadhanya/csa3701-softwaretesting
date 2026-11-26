@@ -1,0 +1,46 @@
+import java.util.*;
+
+/*
+ * Experiment 4 - Classify the defects of a loan application by defect class
+ * and build a defect repository (Manual)
+ */
+public class LoanDefectRepository {
+
+    enum DefectClass { FUNCTIONAL, CALCULATION, UI, VALIDATION, PERFORMANCE, SECURITY }
+
+    static class Defect {
+        String id, description, severity;
+        DefectClass type;
+        Defect(String id, String description, DefectClass type, String severity) {
+            this.id = id; this.description = description; this.type = type; this.severity = severity;
+        }
+    }
+
+    static List<Defect> repository = new ArrayList<>();
+
+    static void add(String id, String desc, DefectClass c, String sev) {
+        repository.add(new Defect(id, desc, c, sev));
+    }
+
+    public static void main(String[] args) {
+        add("L01", "EMI calculated with wrong interest rate", DefectClass.CALCULATION, "Critical");
+        add("L02", "Applicant age below 21 accepted", DefectClass.VALIDATION, "Major");
+        add("L03", "Submit button misaligned on mobile", DefectClass.UI, "Minor");
+        add("L04", "Loan status not updated after approval", DefectClass.FUNCTIONAL, "Major");
+        add("L05", "PAN number visible in URL", DefectClass.SECURITY, "Critical");
+        add("L06", "Eligibility check takes 15 seconds", DefectClass.PERFORMANCE, "Major");
+        add("L07", "Negative loan amount allowed", DefectClass.VALIDATION, "Major");
+        add("L08", "Processing fee rounding error", DefectClass.CALCULATION, "Minor");
+
+        System.out.println("LOAN APPLICATION - DEFECT REPOSITORY\n");
+        System.out.printf("%-5s %-42s %-12s %-9s%n", "ID", "Description", "Class", "Severity");
+        for (Defect d : repository)
+            System.out.printf("%-5s %-42s %-12s %-9s%n", d.id, d.description, d.type, d.severity);
+
+        System.out.println("\nDefects by class:");
+        Map<DefectClass, Integer> count = new EnumMap<>(DefectClass.class);
+        for (Defect d : repository) count.merge(d.type, 1, Integer::sum);
+        for (Map.Entry<DefectClass, Integer> e : count.entrySet())
+            System.out.println("  " + e.getKey() + " : " + e.getValue());
+    }
+}

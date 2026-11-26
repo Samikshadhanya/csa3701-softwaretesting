@@ -1,0 +1,62 @@
+import org.junit.jupiter.api.*;
+import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
+import static org.junit.jupiter.api.Assertions.*;
+
+/*
+ * Experiment 12 - Locate web elements using id, name, class name, CSS selector
+ * and XPath in Selenium (Selenium)
+ */
+public class LocatorsTest {
+
+    WebDriver driver;
+
+    @BeforeEach
+    void setUp() {
+        driver = new ChromeDriver();
+        driver.get("https://the-internet.herokuapp.com/login");
+    }
+
+    @Test
+    void locateById() {
+        WebElement username = driver.findElement(By.id("username"));
+        username.sendKeys("tomsmith");
+        assertEquals("tomsmith", username.getAttribute("value"));
+    }
+
+    @Test
+    void locateByName() {
+        WebElement password = driver.findElement(By.name("password"));
+        assertTrue(password.isDisplayed());
+        assertEquals("password", password.getAttribute("type"));
+    }
+
+    @Test
+    void locateByClassName() {
+        WebElement button = driver.findElement(By.className("radius"));
+        assertTrue(button.getText().contains("Login"));
+    }
+
+    @Test
+    void locateByCssSelector() {
+        WebElement button = driver.findElement(By.cssSelector("button[type='submit']"));
+        assertTrue(button.isEnabled());
+    }
+
+    @Test
+    void locateByXPath() {
+        WebElement heading = driver.findElement(By.xpath("//div[@class='example']/h2"));
+        assertEquals("Login Page", heading.getText());
+    }
+
+    @Test
+    void locateByLinkText() {
+        WebElement link = driver.findElement(By.linkText("Elemental Selenium"));
+        assertTrue(link.getAttribute("href").contains("elementalselenium"));
+    }
+
+    @AfterEach
+    void tearDown() {
+        driver.quit();
+    }
+}

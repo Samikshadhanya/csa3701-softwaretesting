@@ -1,0 +1,54 @@
+import java.time.LocalDate;
+import java.util.*;
+
+/*
+ * Experiment 24 - Create test data for a ticket booking application (Manual)
+ * Fields: passenger name, age, travel date, number of seats, class, phone
+ * Rules: name letters only (2-30), age 1-120, date today..+120 days, seats 1-6,
+ *        class SL/3A/2A/1A, phone 10 digits starting 6-9
+ */
+public class TicketBookingTestData {
+
+    static List<String> validate(String name, int age, LocalDate date, int seats, String cls, String phone) {
+        List<String> errors = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+        if (!name.matches("[A-Za-z ]{2,30}")) errors.add("name");
+        if (age < 1 || age > 120) errors.add("age");
+        if (date.isBefore(today) || date.isAfter(today.plusDays(120))) errors.add("date");
+        if (seats < 1 || seats > 6) errors.add("seats");
+        if (!List.of("SL", "3A", "2A", "1A").contains(cls)) errors.add("class");
+        if (!phone.matches("[6-9][0-9]{9}")) errors.add("phone");
+        return errors;
+    }
+
+    public static void main(String[] args) {
+        LocalDate t = LocalDate.now();
+        Object[][] data = {
+            {"Valid - all fields", "Ravi Kumar", 30, t.plusDays(10), 2, "3A", "9876543210", "Valid"},
+            {"Valid - max seats", "Anita", 45, t.plusDays(120), 6, "SL", "6123456789", "Valid"},
+            {"Valid - same day", "Joe", 1, t, 1, "1A", "7000000000", "Valid"},
+            {"Invalid name digits", "Ravi123", 30, t.plusDays(5), 1, "2A", "9876543210", "name"},
+            {"Invalid age 0", "Meena", 0, t.plusDays(5), 1, "2A", "9876543210", "age"},
+            {"Invalid age 121", "Meena", 121, t.plusDays(5), 1, "2A", "9876543210", "age"},
+            {"Past date", "Arun", 25, t.minusDays(1), 1, "SL", "9876543210", "date"},
+            {"Date beyond 120 days", "Arun", 25, t.plusDays(121), 1, "SL", "9876543210", "date"},
+            {"Zero seats", "Priya", 22, t.plusDays(3), 0, "3A", "9876543210", "seats"},
+            {"7 seats", "Priya", 22, t.plusDays(3), 7, "3A", "9876543210", "seats"},
+            {"Invalid class", "Kiran", 40, t.plusDays(3), 2, "EC", "9876543210", "class"},
+            {"Phone starts with 5", "Kiran", 40, t.plusDays(3), 2, "SL", "5876543210", "phone"},
+            {"Phone 9 digits", "Kiran", 40, t.plusDays(3), 2, "SL", "987654321", "phone"}
+        };
+
+        System.out.println("TICKET BOOKING - TEST DATA SET\n");
+        System.out.printf("%-4s %-22s %-10s %-4s %-11s %-5s %-5s %-11s %-9s %-6s%n",
+                "No", "Scenario", "Name", "Age", "Date", "Seats", "Class", "Phone", "Expected", "Result");
+        int i = 1;
+        for (Object[] d : data) {
+            List<String> err = validate((String) d[1], (int) d[2], (LocalDate) d[3], (int) d[4],
+                    (String) d[5], (String) d[6]);
+            String actual = err.isEmpty() ? "Valid" : String.join(",", err);
+            System.out.printf("%-4d %-22s %-10s %-4d %-11s %-5d %-5s %-11s %-9s %-6s%n", i++,
+                    d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7], actual.equals(d[7]) ? "PASS" : "FAIL");
+        }
+    }
+}

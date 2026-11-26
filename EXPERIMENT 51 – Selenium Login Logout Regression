@@ -1,0 +1,74 @@
+import org.junit.jupiter.api.*;
+import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
+import static org.junit.jupiter.api.Assertions.*;
+
+/*
+ * Experiment 51 - Implement regression testing of the login and logout
+ * functionality using Selenium WebDriver (Selenium)
+ * Run the whole suite again after every build: mvn test -Dgroups=regression
+ */
+@Tag("regression")
+public class LoginLogoutRegressionTest {
+
+    WebDriver driver;
+    static final String BASE = "https://the-internet.herokuapp.com";
+
+    @BeforeEach
+    void setUp() {
+        driver = new ChromeDriver();
+        driver.get(BASE + "/login");
+    }
+
+    void login(String user, String pass) {
+        driver.findElement(By.id("username")).sendKeys(user);
+        driver.findElement(By.id("password")).sendKeys(pass);
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
+    }
+
+    String flash() {
+        return driver.findElement(By.id("flash")).getText();
+    }
+
+    @Test
+    void RT01_validLogin() {
+        login("tomsmith", "SuperSecretPassword!");
+        assertTrue(flash().contains("You logged into a secure area!"));
+    }
+
+    @Test
+    void RT02_logoutAfterLogin() {
+        login("tomsmith", "SuperSecretPassword!");
+        driver.findElement(By.cssSelector("a[href='/logout']")).click();
+        assertTrue(flash().contains("You logged out of the secure area!"));
+        assertTrue(driver.getCurrentUrl().endsWith("/login"));
+    }
+
+    @Test
+    void RT03_secureAreaBlockedAfterLogout() {
+        login("tomsmith", "SuperSecretPassword!");
+        driver.findElement(By.cssSelector("a[href='/logout']")).click();
+        driver.get(BASE + "/secure");
+        assertTrue(flash().contains("You must login to view the secure area!"));
+    }
+
+    @Test
+    void RT04_invalidLoginStillRejected() {
+        login("tomsmith", "bad");
+        assertTrue(flash().contains("Your password is invalid!"));
+    }
+
+    @Test
+    void RT05_backButtonAfterLogout() {
+        login("tomsmith", "SuperSecretPassword!");
+        driver.findElement(By.cssSelector("a[href='/logout']")).click();
+        driver.navigate().back();
+        driver.navigate().refresh();
+        assertFalse(driver.getPageSource().contains("Welcome to the Secure Area"));
+    }
+
+    @AfterEach
+    void tearDown() {
+        driver.quit();
+    }
+}

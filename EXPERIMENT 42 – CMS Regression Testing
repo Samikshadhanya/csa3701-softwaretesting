@@ -1,0 +1,63 @@
+import java.util.*;
+
+/*
+ * Experiment 42 - Implement regression testing for a content management system
+ * after updates (Manual)
+ * The same regression suite is run on version 1.0 and the updated version 1.1 to
+ * make sure existing features still work after the change.
+ */
+public class CMSRegressionTest {
+
+    static class CMS {
+        String version;
+        Map<Integer, String> articles = new LinkedHashMap<>();
+        int nextId = 1;
+        CMS(String version) { this.version = version; }
+
+        int create(String title) {
+            if (title == null || title.isBlank()) return -1;
+            articles.put(nextId, title);
+            return nextId++;
+        }
+        boolean edit(int id, String title) {
+            // v1.1 update introduced a defect: edit rejects titles longer than 20 chars
+            if (version.equals("1.1") && title.length() > 20) return false;
+            if (!articles.containsKey(id)) return false;
+            articles.put(id, title);
+            return true;
+        }
+        boolean delete(int id) { return articles.remove(id) != null; }
+        List<String> search(String word) {
+            List<String> r = new ArrayList<>();
+            for (String t : articles.values())
+                if (t.toLowerCase().contains(word.toLowerCase())) r.add(t);
+            return r;
+        }
+        // New feature in v1.1
+        String publish(int id) { return version.equals("1.1") ? "Published: " + articles.get(id) : "N/A"; }
+    }
+
+    static void runSuite(CMS cms) {
+        System.out.println("\nRegression suite on CMS v" + cms.version);
+        int id = cms.create("Software Testing Basics");
+        report("RT01 Create article", id > 0);
+        report("RT02 Reject empty title", cms.create("") == -1);
+        report("RT03 Edit article (long title)", cms.edit(id, "Software Testing Fundamentals"));
+        report("RT04 Search article", cms.search("testing").size() == 1);
+        report("RT05 Delete article", cms.delete(id));
+        report("RT06 Delete non-existing", !cms.delete(99));
+    }
+
+    static void report(String name, boolean ok) {
+        System.out.printf("  %-34s %s%n", name, ok ? "PASS" : "FAIL  <-- regression defect");
+    }
+
+    public static void main(String[] args) {
+        System.out.println("CMS REGRESSION TESTING");
+        runSuite(new CMS("1.0"));
+        CMS updated = new CMS("1.1");
+        runSuite(updated);
+        int id = updated.create("New Feature Check");
+        System.out.println("  New feature test (publish)        : " + updated.publish(id));
+    }
+}

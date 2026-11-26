@@ -1,0 +1,41 @@
+/*
+ * Experiment 22 - Create test cases for a student grade evaluation system
+ * using boundary value analysis (Manual)
+ *
+ * Grade rules: 90-100 O, 80-89 A, 70-79 B, 60-69 C, 50-59 D, 0-49 F, else Invalid
+ * BVA: test min-1, min, min+1, max-1, max, max+1 of every range.
+ */
+public class GradeBVA {
+
+    static String grade(int marks) {
+        if (marks < 0 || marks > 100) return "Invalid";
+        if (marks >= 90) return "O";
+        if (marks >= 80) return "A";
+        if (marks >= 70) return "B";
+        if (marks >= 60) return "C";
+        if (marks >= 50) return "D";
+        return "F";
+    }
+
+    public static void main(String[] args) {
+        Object[][] tests = {
+            {-1, "Invalid"}, {0, "F"}, {1, "F"}, {48, "F"}, {49, "F"},
+            {50, "D"}, {51, "D"}, {59, "D"},
+            {60, "C"}, {69, "C"},
+            {70, "B"}, {79, "B"},
+            {80, "A"}, {89, "A"},
+            {90, "O"}, {99, "O"}, {100, "O"}, {101, "Invalid"}
+        };
+
+        System.out.println("STUDENT GRADE - BOUNDARY VALUE ANALYSIS TEST CASES\n");
+        System.out.printf("%-6s %-7s %-10s %-8s %-6s%n", "TC", "Marks", "Expected", "Actual", "Result");
+        int i = 1, pass = 0;
+        for (Object[] t : tests) {
+            String actual = grade((int) t[0]);
+            boolean ok = actual.equals(t[1]);
+            if (ok) pass++;
+            System.out.printf("TC%-4d %-7d %-10s %-8s %-6s%n", i++, t[0], t[1], actual, ok ? "PASS" : "FAIL");
+        }
+        System.out.println("\nPassed " + pass + " of " + tests.length);
+    }
+}

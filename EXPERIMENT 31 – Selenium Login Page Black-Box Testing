@@ -1,0 +1,64 @@
+import org.junit.jupiter.api.*;
+import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
+import static org.junit.jupiter.api.Assertions.*;
+
+/*
+ * Experiment 31 - Execute black-box testing on a login page using
+ * Selenium WebDriver (Selenium)
+ * Application: https://the-internet.herokuapp.com/login
+ * Valid credentials: tomsmith / SuperSecretPassword!
+ */
+public class LoginBlackBoxSeleniumTest {
+
+    WebDriver driver;
+
+    @BeforeEach
+    void setUp() {
+        driver = new ChromeDriver();
+        driver.get("https://the-internet.herokuapp.com/login");
+    }
+
+    String login(String user, String pass) {
+        driver.findElement(By.id("username")).sendKeys(user);
+        driver.findElement(By.id("password")).sendKeys(pass);
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
+        return driver.findElement(By.id("flash")).getText();
+    }
+
+    @Test
+    void validCredentials() {
+        assertTrue(login("tomsmith", "SuperSecretPassword!").contains("You logged into a secure area!"));
+        assertTrue(driver.getCurrentUrl().endsWith("/secure"));
+    }
+
+    @Test
+    void invalidUsername() {
+        assertTrue(login("wronguser", "SuperSecretPassword!").contains("Your username is invalid!"));
+    }
+
+    @Test
+    void invalidPassword() {
+        assertTrue(login("tomsmith", "wrongpass").contains("Your password is invalid!"));
+    }
+
+    @Test
+    void emptyFields() {
+        assertTrue(login("", "").contains("Your username is invalid!"));
+    }
+
+    @Test
+    void caseSensitiveUsername() {
+        assertTrue(login("TOMSMITH", "SuperSecretPassword!").contains("Your username is invalid!"));
+    }
+
+    @Test
+    void passwordFieldIsMasked() {
+        assertEquals("password", driver.findElement(By.id("password")).getAttribute("type"));
+    }
+
+    @AfterEach
+    void tearDown() {
+        driver.quit();
+    }
+}

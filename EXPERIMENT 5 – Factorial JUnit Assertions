@@ -1,0 +1,48 @@
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+/*
+ * Experiment 5 - Calculate the factorial of a number and validate the output
+ * using JUnit assertions (JUnit)
+ */
+class Factorial {
+    static long factorial(int n) {
+        if (n < 0) throw new IllegalArgumentException("Negative number");
+        long result = 1;
+        for (int i = 2; i <= n; i++) result *= i;
+        return result;
+    }
+}
+
+public class FactorialTest {
+
+    @Test
+    void testFactorialOfZero() {
+        assertEquals(1, Factorial.factorial(0));
+    }
+
+    @Test
+    void testFactorialOfOne() {
+        assertEquals(1, Factorial.factorial(1));
+    }
+
+    @Test
+    void testFactorialOfFive() {
+        assertEquals(120, Factorial.factorial(5));
+    }
+
+    @Test
+    void testFactorialOfTen() {
+        assertEquals(3628800, Factorial.factorial(10));
+    }
+
+    @Test
+    void testResultIsPositive() {
+        assertTrue(Factorial.factorial(6) > 0);
+    }
+
+    @Test
+    void testNegativeInput() {
+        assertThrows(IllegalArgumentException.class, () -> Factorial.factorial(-3));
+    }
+}

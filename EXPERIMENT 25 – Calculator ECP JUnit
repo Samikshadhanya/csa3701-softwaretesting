@@ -1,0 +1,67 @@
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+/*
+ * Experiment 25 - Implement equivalence class partitioning tests for a calculator
+ * using JUnit (JUnit)
+ * Valid range of operands: -1000 to 1000
+ */
+class Calculator {
+    static void check(int n) {
+        if (n < -1000 || n > 1000) throw new IllegalArgumentException("Out of range: " + n);
+    }
+    static int add(int a, int b) { check(a); check(b); return a + b; }
+    static int subtract(int a, int b) { check(a); check(b); return a - b; }
+    static int multiply(int a, int b) { check(a); check(b); return a * b; }
+    static int divide(int a, int b) {
+        check(a); check(b);
+        if (b == 0) throw new ArithmeticException("Divide by zero");
+        return a / b;
+    }
+}
+
+public class CalculatorECPTest {
+
+    // EC1: valid positive numbers
+    @Test
+    void validPositiveNumbers() {
+        assertEquals(30, Calculator.add(10, 20));
+    }
+
+    // EC2: valid negative numbers
+    @Test
+    void validNegativeNumbers() {
+        assertEquals(-30, Calculator.add(-10, -20));
+    }
+
+    // EC3: zero
+    @Test
+    void zeroOperand() {
+        assertEquals(0, Calculator.multiply(0, 500));
+    }
+
+    // EC4: mixed signs
+    @Test
+    void mixedSigns() {
+        assertEquals(-200, Calculator.multiply(-20, 10));
+        assertEquals(-5, Calculator.divide(50, -10));
+    }
+
+    // EC5: invalid - above range
+    @Test
+    void aboveRange() {
+        assertThrows(IllegalArgumentException.class, () -> Calculator.add(1500, 10));
+    }
+
+    // EC6: invalid - below range
+    @Test
+    void belowRange() {
+        assertThrows(IllegalArgumentException.class, () -> Calculator.subtract(-2000, 10));
+    }
+
+    // EC7: invalid - divisor zero
+    @Test
+    void divideByZero() {
+        assertThrows(ArithmeticException.class, () -> Calculator.divide(10, 0));
+    }
+}

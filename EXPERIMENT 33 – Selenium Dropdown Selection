@@ -1,0 +1,58 @@
+import org.junit.jupiter.api.*;
+import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
+import static org.junit.jupiter.api.Assertions.*;
+import org.openqa.selenium.support.ui.Select;
+import java.util.List;
+
+/*
+ * Experiment 33 - Automate dropdown selection using the Select class
+ * in Selenium WebDriver (Selenium)
+ */
+public class DropdownTest {
+
+    WebDriver driver;
+    Select dropdown;
+
+    @BeforeEach
+    void setUp() {
+        driver = new ChromeDriver();
+        driver.get("https://the-internet.herokuapp.com/dropdown");
+        dropdown = new Select(driver.findElement(By.id("dropdown")));
+    }
+
+    @Test
+    void selectByVisibleText() {
+        dropdown.selectByVisibleText("Option 1");
+        assertEquals("Option 1", dropdown.getFirstSelectedOption().getText());
+    }
+
+    @Test
+    void selectByValue() {
+        dropdown.selectByValue("2");
+        assertEquals("Option 2", dropdown.getFirstSelectedOption().getText());
+    }
+
+    @Test
+    void selectByIndex() {
+        dropdown.selectByIndex(1);
+        assertEquals("Option 1", dropdown.getFirstSelectedOption().getText());
+    }
+
+    @Test
+    void verifyAllOptions() {
+        List<WebElement> options = dropdown.getOptions();
+        assertEquals(3, options.size());
+        for (WebElement o : options) System.out.println("Option: " + o.getText());
+    }
+
+    @Test
+    void notMultiSelect() {
+        assertFalse(dropdown.isMultiple());
+    }
+
+    @AfterEach
+    void tearDown() {
+        driver.quit();
+    }
+}

@@ -1,0 +1,73 @@
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+/*
+ * Experiment 46 - Design a test harness using a stub and a driver to unit test
+ * a fare calculation module (JUnit)
+ *
+ * FareCalculator depends on DistanceService (not built yet) -> replaced by a STUB.
+ * The JUnit test class acts as the DRIVER that calls the module under test.
+ */
+interface DistanceService {
+    double distanceKm(String from, String to);
+}
+
+// Stub: returns fixed, known distances instead of calling a real map service
+class DistanceServiceStub implements DistanceService {
+    public double distanceKm(String from, String to) {
+        if (from.equals("Chennai") && to.equals("Vellore")) return 140;
+        if (from.equals("Chennai") && to.equals("Tambaram")) return 25;
+        if (from.equals(to)) return 0;
+        throw new IllegalArgumentException("Unknown route");
+    }
+}
+
+// Module under test
+class FareCalculator {
+    private final DistanceService service;
+    FareCalculator(DistanceService service) { this.service = service; }
+
+    double fare(String from, String to, boolean senior) {
+        double km = service.distanceKm(from, to);
+        if (km == 0) return 0;
+        double fare = 30 + (km <= 50 ? km * 2 : 100 + (km - 50) * 1.5);  // base + per km
+        if (senior) fare *= 0.6;                                         // 40% concession
+        return Math.round(fare * 100) / 100.0;
+    }
+}
+
+// Driver
+public class FareCalculatorHarnessTest {
+
+    FareCalculator calc;
+
+    @BeforeEach
+    void setUp() {
+        calc = new FareCalculator(new DistanceServiceStub());
+    }
+
+    @Test
+    void shortDistanceFare() {
+        assertEquals(80.0, calc.fare("Chennai", "Tambaram", false));   // 30 + 25*2
+    }
+
+    @Test
+    void longDistanceFare() {
+        assertEquals(265.0, calc.fare("Chennai", "Vellore", false));   // 30 + 100 + 90*1.5
+    }
+
+    @Test
+    void seniorCitizenConcession() {
+        assertEquals(159.0, calc.fare("Chennai", "Vellore", true));
+    }
+
+    @Test
+    void sameSourceAndDestination() {
+        assertEquals(0.0, calc.fare("Chennai", "Chennai", false));
+    }
+
+    @Test
+    void unknownRoute() {
+        assertThrows(IllegalArgumentException.class, () -> calc.fare("Chennai", "Delhi", false));
+    }
+}

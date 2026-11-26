@@ -1,0 +1,85 @@
+import java.util.Scanner;
+
+/*
+ * Experiment 1 - Identify and document the software defects of an ATM system
+ * from its specification (Manual)
+ *
+ * Specification:
+ *  S1. User gets 3 attempts to enter the correct 4-digit PIN; card is blocked after that.
+ *  S2. Withdrawal amount must be positive, a multiple of 100 and <= balance.
+ *  S3. Daily withdrawal limit is Rs. 20,000.
+ *  S4. Deposit amount must be positive.
+ *  S5. Minimum balance of Rs. 500 must be maintained.
+ */
+public class ATMSystem {
+
+    static int balance = 10000;
+    static final int PIN = 1234;
+    static int withdrawnToday = 0;
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("ATM SYSTEM");
+
+        // DEFECT D1: Only one PIN attempt is allowed (spec S1 says 3 attempts)
+        System.out.print("Enter PIN: ");
+        int enteredPin = sc.nextInt();
+        if (enteredPin != PIN) {
+            System.out.println("Wrong PIN. Card blocked.");
+            printDefectReport();
+            return;
+        }
+
+        boolean run = true;
+        while (run) {
+            System.out.println("\n1. Check Balance\n2. Withdraw Money\n3. Deposit Money\n4. Exit");
+            System.out.print("Enter choice: ");
+            int choice = sc.nextInt();
+            switch (choice) {
+                case 1:
+                    System.out.println("Balance: Rs. " + balance);
+                    break;
+                case 2:
+                    System.out.print("Enter amount: ");
+                    int amt = sc.nextInt();
+                    // DEFECT D2: No check for multiple of 100 (spec S2)
+                    // DEFECT D3: Daily limit not enforced (spec S3)
+                    // DEFECT D4: Minimum balance of 500 not maintained (spec S5)
+                    if (amt <= balance) {
+                        balance -= amt;
+                        withdrawnToday += amt;
+                        System.out.println("Collect cash. Balance: Rs. " + balance);
+                    } else {
+                        System.out.println("Insufficient balance");
+                    }
+                    break;
+                case 3:
+                    System.out.print("Enter amount: ");
+                    int dep = sc.nextInt();
+                    // DEFECT D5: Negative / zero deposit accepted (spec S4)
+                    balance += dep;
+                    System.out.println("Deposited. Balance: Rs. " + balance);
+                    break;
+                case 4:
+                    run = false;
+                    break;
+                default:
+                    // DEFECT D6: Invalid option gives no proper message
+                    break;
+            }
+        }
+        printDefectReport();
+        sc.close();
+    }
+
+    static void printDefectReport() {
+        System.out.println("\n---------------- DEFECT REPORT ----------------");
+        System.out.printf("%-4s %-45s %-10s %-8s%n", "ID", "Description", "Severity", "Spec");
+        System.out.printf("%-4s %-45s %-10s %-8s%n", "D1", "Card blocked after 1 wrong PIN, not 3", "High", "S1");
+        System.out.printf("%-4s %-45s %-10s %-8s%n", "D2", "Withdrawal not checked for multiple of 100", "Medium", "S2");
+        System.out.printf("%-4s %-45s %-10s %-8s%n", "D3", "Daily limit of 20,000 not enforced", "High", "S3");
+        System.out.printf("%-4s %-45s %-10s %-8s%n", "D4", "Minimum balance 500 not maintained", "High", "S5");
+        System.out.printf("%-4s %-45s %-10s %-8s%n", "D5", "Negative/zero deposit accepted", "Critical", "S4");
+        System.out.printf("%-4s %-45s %-10s %-8s%n", "D6", "No message for invalid menu option", "Low", "-");
+    }
+}

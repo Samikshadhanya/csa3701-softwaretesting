@@ -1,0 +1,44 @@
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+/*
+ * Experiment 6 - Check whether a given year is a leap year and validate the output
+ * using JUnit assertions (JUnit)
+ */
+class LeapYear {
+    static boolean isLeap(int year) {
+        return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+    }
+}
+
+public class LeapYearTest {
+
+    @Test
+    void testDivisibleBy4() {
+        assertTrue(LeapYear.isLeap(2024));
+    }
+
+    @Test
+    void testNotDivisibleBy4() {
+        assertFalse(LeapYear.isLeap(2023));
+    }
+
+    @Test
+    void testCenturyNotLeap() {
+        assertFalse(LeapYear.isLeap(1900));
+    }
+
+    @Test
+    void testDivisibleBy400() {
+        assertTrue(LeapYear.isLeap(2000));
+    }
+
+    @Test
+    void testMultipleYears() {
+        assertAll(
+            () -> assertTrue(LeapYear.isLeap(1996)),
+            () -> assertFalse(LeapYear.isLeap(2100)),
+            () -> assertTrue(LeapYear.isLeap(2400))
+        );
+    }
+}

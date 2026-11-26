@@ -1,0 +1,59 @@
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+
+/*
+ * Experiment 44 - Execute acceptance testing for a hotel reservation system (Manual)
+ * Acceptance criteria are written as user stories (Given / When / Then)
+ * and checked against the system.
+ */
+public class HotelAcceptanceTest {
+
+    static class Hotel {
+        Map<String, Integer> rooms = new HashMap<>(Map.of("Standard", 3, "Deluxe", 1));
+        Map<String, Integer> rate = Map.of("Standard", 2000, "Deluxe", 4500);
+        Map<Integer, String> bookings = new HashMap<>();
+        int nextId = 100;
+
+        String book(String type, LocalDate in, LocalDate out) {
+            if (!in.isBefore(out)) return "Invalid dates";
+            if (in.isBefore(LocalDate.now())) return "Past date not allowed";
+            if (rooms.getOrDefault(type, 0) == 0) return "No rooms available";
+            rooms.merge(type, -1, Integer::sum);
+            long nights = ChronoUnit.DAYS.between(in, out);
+            bookings.put(nextId, type);
+            return "Booked #" + (nextId++) + " Amount Rs." + nights * rate.get(type);
+        }
+        String cancel(int id) {
+            String type = bookings.remove(id);
+            if (type == null) return "Booking not found";
+            rooms.merge(type, 1, Integer::sum);
+            return "Cancelled";
+        }
+    }
+
+    public static void main(String[] args) {
+        Hotel h = new Hotel();
+        LocalDate d = LocalDate.now().plusDays(5);
+        System.out.println("HOTEL RESERVATION - USER ACCEPTANCE TESTING\n");
+
+        accept("AT01", "Given a Standard room is free, when guest books 2 nights, then booking is confirmed with amount",
+               h.book("Standard", d, d.plusDays(2)).equals("Booked #100 Amount Rs.4000"));
+        accept("AT02", "Given check-out before check-in, when guest books, then 'Invalid dates' is shown",
+               h.book("Standard", d, d.minusDays(1)).equals("Invalid dates"));
+        accept("AT03", "Given a past check-in date, when guest books, then booking is refused",
+               h.book("Deluxe", LocalDate.now().minusDays(2), d).equals("Past date not allowed"));
+        accept("AT04", "Given the only Deluxe room is booked, when another guest books Deluxe, then 'No rooms available'",
+               h.book("Deluxe", d, d.plusDays(1)).startsWith("Booked") &&
+               h.book("Deluxe", d, d.plusDays(1)).equals("No rooms available"));
+        accept("AT05", "Given an existing booking, when guest cancels, then room becomes available again",
+               h.cancel(101).equals("Cancelled") && h.book("Deluxe", d, d.plusDays(1)).startsWith("Booked"));
+        accept("AT06", "Given an unknown booking id, when guest cancels, then 'Booking not found'",
+               h.cancel(999).equals("Booking not found"));
+    }
+
+    static void accept(String id, String story, boolean ok) {
+        System.out.println(id + " : " + story);
+        System.out.println("       -> " + (ok ? "ACCEPTED" : "REJECTED") + "\n");
+    }
+}

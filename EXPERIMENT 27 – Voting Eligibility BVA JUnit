@@ -1,0 +1,52 @@
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+/*
+ * Experiment 27 - Validate voting eligibility based on age using
+ * boundary value analysis in JUnit (JUnit)
+ * Valid age: 0-150. Eligible: age >= 18
+ */
+class VotingEligibility {
+    static boolean canVote(int age) {
+        if (age < 0 || age > 150) throw new IllegalArgumentException("Invalid age");
+        return age >= 18;
+    }
+}
+
+public class VotingEligibilityTest {
+
+    @Test
+    void ageJustBelowEligibility() {
+        assertFalse(VotingEligibility.canVote(17));
+    }
+
+    @Test
+    void ageAtEligibility() {
+        assertTrue(VotingEligibility.canVote(18));
+    }
+
+    @Test
+    void ageJustAboveEligibility() {
+        assertTrue(VotingEligibility.canVote(19));
+    }
+
+    @Test
+    void minimumValidAge() {
+        assertFalse(VotingEligibility.canVote(0));
+    }
+
+    @Test
+    void maximumValidAge() {
+        assertTrue(VotingEligibility.canVote(150));
+    }
+
+    @Test
+    void belowMinimumAge() {
+        assertThrows(IllegalArgumentException.class, () -> VotingEligibility.canVote(-1));
+    }
+
+    @Test
+    void aboveMaximumAge() {
+        assertThrows(IllegalArgumentException.class, () -> VotingEligibility.canVote(151));
+    }
+}

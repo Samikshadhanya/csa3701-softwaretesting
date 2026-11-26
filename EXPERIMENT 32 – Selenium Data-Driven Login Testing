@@ -1,0 +1,44 @@
+import org.junit.jupiter.api.*;
+import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+
+/*
+ * Experiment 32 - Implement data-driven testing of a login page using JUnit
+ * parameterized tests and Selenium (Selenium)
+ */
+public class DataDrivenLoginTest {
+
+    WebDriver driver;
+
+    @BeforeEach
+    void setUp() {
+        driver = new ChromeDriver();
+        driver.get("https://the-internet.herokuapp.com/login");
+    }
+
+    @ParameterizedTest(name = "{index}: user={0}, pass={1} -> {2}")
+    @CsvSource({
+        "tomsmith,  SuperSecretPassword!, You logged into a secure area!",
+        "tomsmith,  wrongPassword,        Your password is invalid!",
+        "admin,     SuperSecretPassword!, Your username is invalid!",
+        "TomSmith,  SuperSecretPassword!, Your username is invalid!",
+        "tomsmith,  supersecretpassword!, Your password is invalid!"
+    })
+    void loginWithData(String user, String pass, String expectedMessage) {
+        driver.findElement(By.id("username")).sendKeys(user);
+        driver.findElement(By.id("password")).sendKeys(pass);
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
+
+        String flash = driver.findElement(By.id("flash")).getText();
+        System.out.println(user + " / " + pass + " => " + flash);
+        assertTrue(flash.contains(expectedMessage));
+    }
+
+    @AfterEach
+    void tearDown() {
+        driver.quit();
+    }
+}

@@ -1,0 +1,90 @@
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+/*
+ * Experiment 45 - Implement unit testing for a bank account management
+ * application using JUnit (JUnit)
+ */
+class BankAccount {
+    private final String accountNo;
+    private double balance;
+
+    BankAccount(String accountNo, double opening) {
+        if (opening < 0) throw new IllegalArgumentException("Opening balance cannot be negative");
+        this.accountNo = accountNo;
+        this.balance = opening;
+    }
+
+    void deposit(double amt) {
+        if (amt <= 0) throw new IllegalArgumentException("Deposit must be positive");
+        balance += amt;
+    }
+
+    void withdraw(double amt) {
+        if (amt <= 0) throw new IllegalArgumentException("Withdrawal must be positive");
+        if (amt > balance) throw new IllegalStateException("Insufficient funds");
+        balance -= amt;
+    }
+
+    void transfer(BankAccount to, double amt) {
+        withdraw(amt);
+        to.deposit(amt);
+    }
+
+    double getBalance() { return balance; }
+    String getAccountNo() { return accountNo; }
+}
+
+public class BankAccountTest {
+
+    BankAccount acc;
+
+    @BeforeEach
+    void setUp() {
+        acc = new BankAccount("SB1001", 5000);
+    }
+
+    @Test
+    void openingBalance() {
+        assertEquals(5000, acc.getBalance());
+        assertEquals("SB1001", acc.getAccountNo());
+    }
+
+    @Test
+    void depositIncreasesBalance() {
+        acc.deposit(1500);
+        assertEquals(6500, acc.getBalance());
+    }
+
+    @Test
+    void withdrawDecreasesBalance() {
+        acc.withdraw(2000);
+        assertEquals(3000, acc.getBalance());
+    }
+
+    @Test
+    void withdrawMoreThanBalance() {
+        assertThrows(IllegalStateException.class, () -> acc.withdraw(6000));
+        assertEquals(5000, acc.getBalance());
+    }
+
+    @Test
+    void negativeDepositRejected() {
+        assertThrows(IllegalArgumentException.class, () -> acc.deposit(-100));
+    }
+
+    @Test
+    void negativeOpeningBalanceRejected() {
+        assertThrows(IllegalArgumentException.class, () -> new BankAccount("SB1002", -1));
+    }
+
+    @Test
+    void transferBetweenAccounts() {
+        BankAccount other = new BankAccount("SB2001", 1000);
+        acc.transfer(other, 2500);
+        assertAll(
+            () -> assertEquals(2500, acc.getBalance()),
+            () -> assertEquals(3500, other.getBalance())
+        );
+    }
+}

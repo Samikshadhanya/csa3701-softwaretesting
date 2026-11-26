@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Experiment 56 - Performance testing of a student portal
+     Execute performance testing on a student portal using JMeter. Set HOST to your portal; the demo uses the-internet.herokuapp.com login/secure pages as the portal.
+     Run: jmeter -n -t "<this file>.jmx" -l results.jtl -e -o report -->
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
+<hashTree>
+<TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Experiment 56 - Performance testing of a student portal" enabled="true">
+<stringProp name="TestPlan.comments">Execute performance testing on a student portal using JMeter. Set HOST to your portal; the demo uses the-internet.herokuapp.com login/secure pages as the portal.</stringProp>
+<boolProp name="TestPlan.functional_mode">false</boolProp>
+<boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+<elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+<collectionProp name="Arguments.arguments">
+<elementProp name="HOST" elementType="Argument">
+<stringProp name="Argument.name">HOST</stringProp>
+<stringProp name="Argument.value">the-internet.herokuapp.com</stringProp>
+<stringProp name="Argument.metadata">=</stringProp>
+</elementProp>
+</collectionProp>
+</elementProp>
+</TestPlan>
+<hashTree>
+<ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP Request Defaults" enabled="true">
+<elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+<collectionProp name="Arguments.arguments"/>
+</elementProp>
+<stringProp name="HTTPSampler.domain">${HOST}</stringProp>
+<stringProp name="HTTPSampler.protocol">https</stringProp>
+<stringProp name="HTTPSampler.connect_timeout">5000</stringProp>
+<stringProp name="HTTPSampler.response_timeout">10000</stringProp>
+</ConfigTestElement>
+<hashTree>
+</hashTree>
+<CookieManager guiclass="CookiePanel" testclass="CookieManager" testname="HTTP Cookie Manager" enabled="true">
+<collectionProp name="CookieManager.cookies"/>
+<boolProp name="CookieManager.clearEachIteration">true</boolProp>
+<boolProp name="CookieManager.controlledByThreadGroup">false</boolProp>
+</CookieManager>
+<hashTree>
+</hashTree>
+<ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Students" enabled="true">
+<stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+<elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+<boolProp name="LoopController.continue_forever">false</boolProp>
+<stringProp name="LoopController.loops">5</stringProp>
+</elementProp>
+<stringProp name="ThreadGroup.num_threads">50</stringProp>
+<stringProp name="ThreadGroup.ramp_time">30</stringProp>
+<boolProp name="ThreadGroup.scheduler">false</boolProp>
+</ThreadGroup>
+<hashTree>
+<TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="Open Portal" enabled="true">
+<boolProp name="TransactionController.includeTimers">false</boolProp>
+<boolProp name="TransactionController.parent">false</boolProp>
+</TransactionController>
+<hashTree>
+<HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Home Page" enabled="true">
+<elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+<collectionProp name="Arguments.arguments">
+</collectionProp>
+</elementProp>
+<stringProp name="HTTPSampler.domain"></stringProp>
+<stringProp name="HTTPSampler.protocol"></stringProp>
+<stringProp name="HTTPSampler.path">/</stringProp>
+<stringProp name="HTTPSampler.method">GET</stringProp>
+<boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+<boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+</HTTPSamplerProxy>
+<hashTree>
+<ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assert Status 200" enabled="true">
+<collectionProp name="Asserion.test_strings">
+<stringProp name="49586">200</stringProp>
+</collectionProp>
+<stringProp name="Assertion.custom_message"></stringProp>
+<stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+<boolProp name="Assertion.assume_success">false</boolProp>
+<intProp name="Assertion.test_type">8</intProp>
+</ResponseAssertion>
+<hashTree>
+</hashTree>
+<DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="Response Time &lt; 3000 ms" enabled="true">
+<stringProp name="DurationAssertion.duration">3000</stringProp>
+</DurationAssertion>
+<hashTree>
+</hashTree>
+</hashTree>
+</hashTree>
+<HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Login Page" enabled="true">
+<elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+<collectionProp name="Arguments.arguments">
+</collectionProp>
+</elementProp>
+<stringProp name="HTTPSampler.domain"></stringProp>
+<stringProp name="HTTPSampler.protocol"></stringProp>
+<stringProp name="HTTPSampler.path">/login</stringProp>
+<stringProp name="HTTPSampler.method">GET</stringProp>
+<boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+<boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+</HTTPSamplerProxy>
+<hashTree>
+<DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="Response Time &lt; 3000 ms" enabled="true">
+<stringProp name="DurationAssertion.duration">3000</stringProp>
+</DurationAssertion>
+<hashTree>
+</hashTree>
+</hashTree>
+<HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Student Login" enabled="true">
+<elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+<collectionProp name="Arguments.arguments">
+<elementProp name="username" elementType="HTTPArgument">
+<boolProp name="HTTPArgument.always_encode">true</boolProp>
+<stringProp name="Argument.name">username</stringProp>
+<stringProp name="Argument.value">tomsmith</stringProp>
+<stringProp name="Argument.metadata">=</stringProp>
+<boolProp name="HTTPArgument.use_equals">true</boolProp>
+</elementProp>
+<elementProp name="password" elementType="HTTPArgument">
+<boolProp name="HTTPArgument.always_encode">true</boolProp>
+<stringProp name="Argument.name">password</stringProp>
+<stringProp name="Argument.value">SuperSecretPassword!</stringProp>
+<stringProp name="Argument.metadata">=</stringProp>
+<boolProp name="HTTPArgument.use_equals">true</boolProp>
+</elementProp>
+</collectionProp>
+</elementProp>
+<stringProp name="HTTPSampler.domain"></stringProp>
+<stringProp name="HTTPSampler.protocol"></stringProp>
+<stringProp name="HTTPSampler.path">/authenticate</stringProp>
+<stringProp name="HTTPSampler.method">POST</stringProp>
+<boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+<boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+</HTTPSamplerProxy>
+<hashTree>
+<ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Logged in" enabled="true">
+<collectionProp name="Asserion.test_strings">
+<stringProp name="49586">Secure Area</stringProp>
+</collectionProp>
+<stringProp name="Assertion.custom_message"></stringProp>
+<stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+<boolProp name="Assertion.assume_success">false</boolProp>
+<intProp name="Assertion.test_type">16</intProp>
+</ResponseAssertion>
+<hashTree>
+</hashTree>
+<DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="Response Time &lt; 3000 ms" enabled="true">
+<stringProp name="DurationAssertion.duration">3000</stringProp>
+</DurationAssertion>
+<hashTree>
+</hashTree>
+</hashTree>
+<HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Dashboard" enabled="true">
+<elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+<collectionProp name="Arguments.arguments">
+</collectionProp>
+</elementProp>
+<stringProp name="HTTPSampler.domain"></stringProp>
+<stringProp name="HTTPSampler.protocol"></stringProp>
+<stringProp name="HTTPSampler.path">/secure</stringProp>
+<stringProp name="HTTPSampler.method">GET</stringProp>
+<boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+<boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+</HTTPSamplerProxy>
+<hashTree>
+<DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="Response Time &lt; 3000 ms" enabled="true">
+<stringProp name="DurationAssertion.duration">3000</stringProp>
+</DurationAssertion>
+<hashTree>
+</hashTree>
+<ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="Think Time 1000 ms" enabled="true">
+<stringProp name="ConstantTimer.delay">1000</stringProp>
+</ConstantTimer>
+<hashTree>
+</hashTree>
+</hashTree>
+<HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Logout" enabled="true">
+<elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+<collectionProp name="Arguments.arguments">
+</collectionProp>
+</elementProp>
+<stringProp name="HTTPSampler.domain"></stringProp>
+<stringProp name="HTTPSampler.protocol"></stringProp>
+<stringProp name="HTTPSampler.path">/logout</stringProp>
+<stringProp name="HTTPSampler.method">GET</stringProp>
+<boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+<boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+</HTTPSamplerProxy>
+<hashTree>
+</hashTree>
+</hashTree>
+<ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report" enabled="true">
+<boolProp name="ResultCollector.error_logging">false</boolProp>
+<objProp>
+<name>saveConfig</name>
+<value class="SampleSaveConfiguration">
+<time>true</time><latency>true</latency><timestamp>true</timestamp><success>true</success>
+<label>true</label><code>true</code><message>true</message><threadName>true</threadName>
+<dataType>true</dataType><encoding>false</encoding><assertions>true</assertions>
+<subresults>true</subresults><responseData>false</responseData><samplerData>false</samplerData>
+<xml>false</xml><fieldNames>true</fieldNames><responseHeaders>false</responseHeaders>
+<requestHeaders>false</requestHeaders><responseDataOnError>false</responseDataOnError>
+<saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+<assertionsResultsToSave>0</assertionsResultsToSave><bytes>true</bytes>
+<sentBytes>true</sentBytes><url>true</url><threadCounts>true</threadCounts>
+<idleTime>true</idleTime><connectTime>true</connectTime>
+</value>
+</objProp>
+<stringProp name="filename"></stringProp>
+</ResultCollector>
+<hashTree>
+</hashTree>
+<ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Aggregate Report" enabled="true">
+<boolProp name="ResultCollector.error_logging">false</boolProp>
+<objProp>
+<name>saveConfig</name>
+<value class="SampleSaveConfiguration">
+<time>true</time><latency>true</latency><timestamp>true</timestamp><success>true</success>
+<label>true</label><code>true</code><message>true</message><threadName>true</threadName>
+<dataType>true</dataType><encoding>false</encoding><assertions>true</assertions>
+<subresults>true</subresults><responseData>false</responseData><samplerData>false</samplerData>
+<xml>false</xml><fieldNames>true</fieldNames><responseHeaders>false</responseHeaders>
+<requestHeaders>false</requestHeaders><responseDataOnError>false</responseDataOnError>
+<saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+<assertionsResultsToSave>0</assertionsResultsToSave><bytes>true</bytes>
+<sentBytes>true</sentBytes><url>true</url><threadCounts>true</threadCounts>
+<idleTime>true</idleTime><connectTime>true</connectTime>
+</value>
+</objProp>
+<stringProp name="filename"></stringProp>
+</ResultCollector>
+<hashTree>
+</hashTree>
+<ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table" enabled="true">
+<boolProp name="ResultCollector.error_logging">false</boolProp>
+<objProp>
+<name>saveConfig</name>
+<value class="SampleSaveConfiguration">
+<time>true</time><latency>true</latency><timestamp>true</timestamp><success>true</success>
+<label>true</label><code>true</code><message>true</message><threadName>true</threadName>
+<dataType>true</dataType><encoding>false</encoding><assertions>true</assertions>
+<subresults>true</subresults><responseData>false</responseData><samplerData>false</samplerData>
+<xml>false</xml><fieldNames>true</fieldNames><responseHeaders>false</responseHeaders>
+<requestHeaders>false</requestHeaders><responseDataOnError>false</responseDataOnError>
+<saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+<assertionsResultsToSave>0</assertionsResultsToSave><bytes>true</bytes>
+<sentBytes>true</sentBytes><url>true</url><threadCounts>true</threadCounts>
+<idleTime>true</idleTime><connectTime>true</connectTime>
+</value>
+</objProp>
+<stringProp name="filename"></stringProp>
+</ResultCollector>
+<hashTree>
+</hashTree>
+</hashTree>
+</hashTree>
+</jmeterTestPlan>

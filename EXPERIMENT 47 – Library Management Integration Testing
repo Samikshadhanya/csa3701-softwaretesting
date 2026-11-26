@@ -1,0 +1,109 @@
+import org.junit.jupiter.api.*;
+import java.util.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+/*
+ * Experiment 47 - Execute integration testing for a library management system
+ * using JUnit (JUnit)
+ * Modules integrated: BookCatalog + MemberRegistry + LoanService
+ */
+class BookCatalog {
+    private final Map<String, Integer> copies = new HashMap<>();
+    void addBook(String isbn, int n) { copies.merge(isbn, n, Integer::sum); }
+    boolean available(String isbn) { return copies.getOrDefault(isbn, 0) > 0; }
+    void take(String isbn) { copies.merge(isbn, -1, Integer::sum); }
+    void giveBack(String isbn) { copies.merge(isbn, 1, Integer::sum); }
+    int count(String isbn) { return copies.getOrDefault(isbn, 0); }
+}
+
+class MemberRegistry {
+    private final Set<String> members = new HashSet<>();
+    void register(String id) { members.add(id); }
+    boolean isMember(String id) { return members.contains(id); }
+}
+
+class LoanService {
+    static final int MAX_BOOKS = 2;
+    private final BookCatalog catalog;
+    private final MemberRegistry registry;
+    private final Map<String, List<String>> loans = new HashMap<>();
+
+    LoanService(BookCatalog c, MemberRegistry r) { catalog = c; registry = r; }
+
+    String issue(String member, String isbn) {
+        if (!registry.isMember(member)) return "Not a member";
+        if (!catalog.available(isbn)) return "Not available";
+        List<String> l = loans.computeIfAbsent(member, k -> new ArrayList<>());
+        if (l.size() >= MAX_BOOKS) return "Limit reached";
+        catalog.take(isbn);
+        l.add(isbn);
+        return "Issued";
+    }
+
+    String giveBack(String member, String isbn) {
+        List<String> l = loans.getOrDefault(member, new ArrayList<>());
+        if (!l.remove(isbn)) return "Not borrowed";
+        catalog.giveBack(isbn);
+        return "Returned";
+    }
+
+    int borrowedCount(String member) { return loans.getOrDefault(member, List.of()).size(); }
+}
+
+public class LibraryIntegrationTest {
+
+    BookCatalog catalog;
+    MemberRegistry registry;
+    LoanService loans;
+
+    @BeforeEach
+    void setUp() {
+        catalog = new BookCatalog();
+        registry = new MemberRegistry();
+        loans = new LoanService(catalog, registry);
+        catalog.addBook("ISBN-1", 1);
+        catalog.addBook("ISBN-2", 3);
+        catalog.addBook("ISBN-3", 2);
+        registry.register("M01");
+        registry.register("M02");
+    }
+
+    @Test
+    void issueUpdatesCatalogAndLoans() {
+        assertEquals("Issued", loans.issue("M01", "ISBN-2"));
+        assertEquals(2, catalog.count("ISBN-2"));
+        assertEquals(1, loans.borrowedCount("M01"));
+    }
+
+    @Test
+    void nonMemberCannotBorrow() {
+        assertEquals("Not a member", loans.issue("X99", "ISBN-1"));
+        assertEquals(1, catalog.count("ISBN-1"));
+    }
+
+    @Test
+    void lastCopyNotAvailableToSecondMember() {
+        loans.issue("M01", "ISBN-1");
+        assertEquals("Not available", loans.issue("M02", "ISBN-1"));
+    }
+
+    @Test
+    void borrowingLimitEnforced() {
+        loans.issue("M01", "ISBN-1");
+        loans.issue("M01", "ISBN-2");
+        assertEquals("Limit reached", loans.issue("M01", "ISBN-3"));
+    }
+
+    @Test
+    void returnRestoresCatalog() {
+        loans.issue("M01", "ISBN-1");
+        assertEquals("Returned", loans.giveBack("M01", "ISBN-1"));
+        assertTrue(catalog.available("ISBN-1"));
+        assertEquals("Issued", loans.issue("M02", "ISBN-1"));
+    }
+
+    @Test
+    void returnBookNotBorrowed() {
+        assertEquals("Not borrowed", loans.giveBack("M02", "ISBN-3"));
+    }
+}

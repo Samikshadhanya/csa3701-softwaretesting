@@ -1,0 +1,51 @@
+import org.junit.jupiter.api.*;
+import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+
+/*
+ * Experiment 53 - Execute smoke testing of the critical pages of a website
+ * using Selenium WebDriver (Selenium)
+ * Each critical page must load, have the right heading and no error page.
+ */
+@Tag("smoke")
+public class WebsiteSmokeTest {
+
+    static WebDriver driver;
+    static final String BASE = "https://the-internet.herokuapp.com";
+
+    @BeforeAll
+    static void setUp() {
+        driver = new ChromeDriver();
+    }
+
+    @ParameterizedTest(name = "{0} loads with heading ''{1}''")
+    @CsvSource({
+        "/,                   Welcome to the-internet",
+        "/login,              Login Page",
+        "/checkboxes,         Checkboxes",
+        "/dropdown,           Dropdown List",
+        "/upload,             File Uploader",
+        "/javascript_alerts,  JavaScript Alerts"
+    })
+    void criticalPageLoads(String path, String heading) {
+        long start = System.currentTimeMillis();
+        driver.get(BASE + path);
+        long loadTime = System.currentTimeMillis() - start;
+
+        // first heading inside the page content
+        String h = driver.findElement(By.cssSelector("#content h1, #content h2, #content h3")).getText();
+
+        System.out.println(path + " -> " + h + " (" + loadTime + " ms)");
+        assertEquals(heading, h);
+        assertFalse(driver.getPageSource().contains("Not Found"));
+        assertTrue(loadTime < 10000, "Page too slow");
+    }
+
+    @AfterAll
+    static void tearDown() {
+        driver.quit();
+    }
+}

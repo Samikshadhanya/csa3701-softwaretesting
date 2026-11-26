@@ -1,0 +1,61 @@
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+/*
+ * Experiment 29 - Execute path coverage testing on a payroll calculation program
+ * using JUnit (JUnit)
+ *
+ * Paths through netSalary():
+ *  P1: basic <= 0                          -> exception
+ *  P2: hours <= 160, basic <= 50000        -> no overtime, 5% tax
+ *  P3: hours <= 160, basic > 50000         -> no overtime, 10% tax
+ *  P4: hours > 160,  basic <= 50000        -> overtime, 5% tax
+ *  P5: hours > 160,  basic > 50000         -> overtime, 10% tax
+ */
+class Payroll {
+    static double netSalary(double basic, int hours) {
+        if (basic <= 0) throw new IllegalArgumentException("Invalid basic pay");
+        double overtime = 0;
+        if (hours > 160) {
+            overtime = (hours - 160) * 200;
+        }
+        double gross = basic + overtime;
+        double tax;
+        if (basic > 50000) {
+            tax = gross * 0.10;
+        } else {
+            tax = gross * 0.05;
+        }
+        return gross - tax;
+    }
+}
+
+public class PayrollPathCoverageTest {
+
+    @Test
+    void path1InvalidBasic() {
+        assertThrows(IllegalArgumentException.class, () -> Payroll.netSalary(0, 160));
+    }
+
+    @Test
+    void path2NoOvertimeLowTax() {
+        assertEquals(28500.0, Payroll.netSalary(30000, 150), 0.01);
+    }
+
+    @Test
+    void path3NoOvertimeHighTax() {
+        assertEquals(54000.0, Payroll.netSalary(60000, 160), 0.01);
+    }
+
+    @Test
+    void path4OvertimeLowTax() {
+        // gross = 40000 + 10*200 = 42000, tax 5% = 2100
+        assertEquals(39900.0, Payroll.netSalary(40000, 170), 0.01);
+    }
+
+    @Test
+    void path5OvertimeHighTax() {
+        // gross = 80000 + 20*200 = 84000, tax 10% = 8400
+        assertEquals(75600.0, Payroll.netSalary(80000, 180), 0.01);
+    }
+}

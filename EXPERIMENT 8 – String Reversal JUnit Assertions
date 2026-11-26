@@ -1,0 +1,50 @@
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+/*
+ * Experiment 8 - Reverse a given string and validate the output using JUnit assertions (JUnit)
+ */
+class StringReverser {
+    static String reverse(String s) {
+        if (s == null) return null;
+        return new StringBuilder(s).reverse().toString();
+    }
+}
+
+public class StringReverserTest {
+
+    @Test
+    void testNormalString() {
+        assertEquals("olleh", StringReverser.reverse("hello"));
+    }
+
+    @Test
+    void testEmptyString() {
+        assertEquals("", StringReverser.reverse(""));
+    }
+
+    @Test
+    void testSingleCharacter() {
+        assertEquals("a", StringReverser.reverse("a"));
+    }
+
+    @Test
+    void testPalindrome() {
+        assertEquals("madam", StringReverser.reverse("madam"));
+    }
+
+    @Test
+    void testWithSpaces() {
+        assertEquals("dlroW olleH", StringReverser.reverse("Hello World"));
+    }
+
+    @Test
+    void testNullString() {
+        assertNull(StringReverser.reverse(null));
+    }
+
+    @Test
+    void testNotEqual() {
+        assertNotEquals("hello", StringReverser.reverse("hello"));
+    }
+}

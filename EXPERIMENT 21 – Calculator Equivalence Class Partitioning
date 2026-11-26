@@ -1,0 +1,59 @@
+/*
+ * Experiment 21 - Create test cases for a simple calculator application
+ * using equivalence class partitioning (Manual)
+ *
+ * Input range accepted by calculator: -10000 to 10000 (integers)
+ * Equivalence classes:
+ *  EC1 valid   : -10000 <= n <= 10000
+ *  EC2 invalid : n < -10000
+ *  EC3 invalid : n > 10000
+ *  EC4 invalid : non-numeric input
+ *  EC5 invalid : division by zero
+ */
+public class CalculatorECP {
+
+    static String calculate(String a, String b, char op) {
+        int x, y;
+        try {
+            x = Integer.parseInt(a);
+            y = Integer.parseInt(b);
+        } catch (NumberFormatException e) {
+            return "Invalid input";
+        }
+        if (x < -10000 || x > 10000 || y < -10000 || y > 10000) return "Out of range";
+        switch (op) {
+            case '+': return String.valueOf(x + y);
+            case '-': return String.valueOf(x - y);
+            case '*': return String.valueOf(x * y);
+            case '/': return y == 0 ? "Cannot divide by zero" : String.valueOf(x / y);
+            default:  return "Invalid operator";
+        }
+    }
+
+    public static void main(String[] args) {
+        Object[][] tests = {
+            {"TC01", "EC1", "50", "25", '+', "75"},
+            {"TC02", "EC1", "-40", "10", '-', "-50"},
+            {"TC03", "EC1", "12", "5", '*', "60"},
+            {"TC04", "EC1", "100", "4", '/', "25"},
+            {"TC05", "EC2", "-20000", "5", '+', "Out of range"},
+            {"TC06", "EC3", "50000", "5", '*', "Out of range"},
+            {"TC07", "EC4", "abc", "5", '+', "Invalid input"},
+            {"TC08", "EC5", "10", "0", '/', "Cannot divide by zero"},
+            {"TC09", "EC6", "10", "2", '%', "Invalid operator"}
+        };
+
+        System.out.println("CALCULATOR - EQUIVALENCE CLASS PARTITIONING TEST CASES\n");
+        System.out.printf("%-5s %-4s %-8s %-6s %-3s %-22s %-22s %-6s%n",
+                "TC", "EC", "A", "B", "Op", "Expected", "Actual", "Result");
+        int pass = 0;
+        for (Object[] t : tests) {
+            String actual = calculate((String) t[2], (String) t[3], (char) t[4]);
+            boolean ok = actual.equals(t[5]);
+            if (ok) pass++;
+            System.out.printf("%-5s %-4s %-8s %-6s %-3s %-22s %-22s %-6s%n",
+                    t[0], t[1], t[2], t[3], t[4], t[5], actual, ok ? "PASS" : "FAIL");
+        }
+        System.out.println("\nPassed " + pass + " of " + tests.length);
+    }
+}

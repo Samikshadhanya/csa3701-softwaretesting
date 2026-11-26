@@ -1,0 +1,46 @@
+import org.junit.jupiter.api.*;
+import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
+import static org.junit.jupiter.api.Assertions.*;
+import java.nio.file.*;
+
+/*
+ * Experiment 54 - Automate the file upload functionality of a website
+ * using Selenium WebDriver (Selenium)
+ */
+public class FileUploadTest {
+
+    WebDriver driver;
+    Path testFile;
+
+    @BeforeEach
+    void setUp() throws Exception {
+        driver = new ChromeDriver();
+        driver.get("https://the-internet.herokuapp.com/upload");
+        testFile = Files.createTempFile("selenium-upload-", ".txt");
+        Files.writeString(testFile, "File uploaded by Selenium WebDriver");
+    }
+
+    @Test
+    void uploadFile() {
+        // sendKeys on <input type="file"> passes the absolute path - no OS dialog needed
+        driver.findElement(By.id("file-upload")).sendKeys(testFile.toAbsolutePath().toString());
+        driver.findElement(By.id("file-submit")).click();
+
+        assertEquals("File Uploaded!", driver.findElement(By.tagName("h3")).getText());
+        assertEquals(testFile.getFileName().toString(),
+                driver.findElement(By.id("uploaded-files")).getText());
+    }
+
+    @Test
+    void submitWithoutFileShowsError() {
+        driver.findElement(By.id("file-submit")).click();
+        assertTrue(driver.getPageSource().contains("Internal Server Error"));
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        driver.quit();
+        Files.deleteIfExists(testFile);
+    }
+}

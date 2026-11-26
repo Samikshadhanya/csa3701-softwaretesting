@@ -1,0 +1,46 @@
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+/*
+ * Experiment 26 - Implement boundary value analysis for a student grade
+ * evaluation system using JUnit (JUnit)
+ */
+class GradeEvaluator {
+    static String grade(int marks) {
+        if (marks < 0 || marks > 100) throw new IllegalArgumentException("Invalid marks");
+        if (marks >= 90) return "O";
+        if (marks >= 80) return "A";
+        if (marks >= 70) return "B";
+        if (marks >= 60) return "C";
+        if (marks >= 50) return "D";
+        return "F";
+    }
+}
+
+public class GradeEvaluatorBVATest {
+
+    @ParameterizedTest(name = "marks={0} -> grade {1}")
+    @CsvSource({
+        "0, F", "1, F", "49, F",
+        "50, D", "51, D", "59, D",
+        "60, C", "69, C",
+        "70, B", "79, B",
+        "80, A", "89, A",
+        "90, O", "99, O", "100, O"
+    })
+    void boundaryValues(int marks, String expected) {
+        assertEquals(expected, GradeEvaluator.grade(marks));
+    }
+
+    @Test
+    void justBelowMinimum() {
+        assertThrows(IllegalArgumentException.class, () -> GradeEvaluator.grade(-1));
+    }
+
+    @Test
+    void justAboveMaximum() {
+        assertThrows(IllegalArgumentException.class, () -> GradeEvaluator.grade(101));
+    }
+}

@@ -1,0 +1,50 @@
+import java.util.*;
+
+/*
+ * Experiment 23 - Execute black-box testing on a login module (Manual)
+ * Only inputs and outputs are considered - internal code is treated as unknown.
+ * Rules: username 5-15 chars, password >= 8 chars with a digit, 3 failures lock the account.
+ */
+public class LoginBlackBox {
+
+    static Map<String, String> users = new HashMap<>(Map.of("student", "pass1234", "admin", "admin@123"));
+    static Map<String, Integer> fails = new HashMap<>();
+
+    static String login(String user, String pass) {
+        if (user == null || user.isEmpty() || pass == null || pass.isEmpty()) return "Fields cannot be empty";
+        if (user.length() < 5 || user.length() > 15) return "Invalid username length";
+        if (fails.getOrDefault(user, 0) >= 3) return "Account locked";
+        if (pass.equals(users.get(user))) {
+            fails.put(user, 0);
+            return "Login successful";
+        }
+        fails.merge(user, 1, Integer::sum);
+        return "Invalid credentials";
+    }
+
+    public static void main(String[] args) {
+        String[][] tests = {
+            {"Valid username and password", "student", "pass1234", "Login successful"},
+            {"Valid user, wrong password", "student", "wrong123", "Invalid credentials"},
+            {"Unregistered user", "guest1", "pass1234", "Invalid credentials"},
+            {"Empty username", "", "pass1234", "Fields cannot be empty"},
+            {"Empty password", "student", "", "Fields cannot be empty"},
+            {"Username too short", "abc", "pass1234", "Invalid username length"},
+            {"Username too long", "averyveryverylonguser", "pass1234", "Invalid username length"},
+            {"Case-sensitive password", "student", "PASS1234", "Invalid credentials"},
+            {"SQL injection attempt", "admin", "' OR '1'='1", "Invalid credentials"},
+            {"2nd failed attempt", "admin", "bad1", "Invalid credentials"},
+            {"3rd failed attempt", "admin", "bad2", "Invalid credentials"},
+            {"Locked after 3 failures", "admin", "admin@123", "Account locked"}
+        };
+
+        System.out.println("LOGIN MODULE - BLACK-BOX TEST EXECUTION\n");
+        System.out.printf("%-5s %-30s %-24s %-24s %-6s%n", "TC", "Scenario", "Expected", "Actual", "Result");
+        int i = 1;
+        for (String[] t : tests) {
+            String actual = login(t[1], t[2]);
+            System.out.printf("TC%-3d %-30s %-24s %-24s %-6s%n", i++, t[0], t[3], actual,
+                    actual.equals(t[3]) ? "PASS" : "FAIL");
+        }
+    }
+}

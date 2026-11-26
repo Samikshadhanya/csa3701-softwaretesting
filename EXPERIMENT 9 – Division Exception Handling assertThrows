@@ -1,0 +1,48 @@
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+/*
+ * Experiment 9 - Test the exception handling of a division program
+ * using assertThrows in JUnit (JUnit)
+ */
+class Division {
+    static int divide(int a, int b) {
+        if (b == 0) throw new ArithmeticException("Division by zero");
+        return a / b;
+    }
+
+    static int parseAndDivide(String a, String b) {
+        return divide(Integer.parseInt(a), Integer.parseInt(b));
+    }
+}
+
+public class DivisionTest {
+
+    @Test
+    void testValidDivision() {
+        assertEquals(5, Division.divide(10, 2));
+    }
+
+    @Test
+    void testDivideByZero() {
+        ArithmeticException ex = assertThrows(ArithmeticException.class,
+                () -> Division.divide(10, 0));
+        assertEquals("Division by zero", ex.getMessage());
+    }
+
+    @Test
+    void testInvalidNumberFormat() {
+        assertThrows(NumberFormatException.class,
+                () -> Division.parseAndDivide("ten", "2"));
+    }
+
+    @Test
+    void testNegativeDivision() {
+        assertEquals(-4, Division.divide(-8, 2));
+    }
+
+    @Test
+    void testNoExceptionForValidInput() {
+        assertDoesNotThrow(() -> Division.divide(9, 3));
+    }
+}

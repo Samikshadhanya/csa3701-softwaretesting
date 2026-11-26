@@ -1,0 +1,47 @@
+import org.junit.jupiter.api.*;
+import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
+import static org.junit.jupiter.api.Assertions.*;
+import org.openqa.selenium.support.ui.Select;
+
+/*
+ * Experiment 13 - Automate the filling and submission of a web form
+ * using Selenium WebDriver (Selenium)
+ */
+public class WebFormTest {
+
+    WebDriver driver;
+
+    @BeforeEach
+    void setUp() {
+        driver = new ChromeDriver();
+        driver.get("https://www.selenium.dev/selenium/web/web-form.html");
+    }
+
+    @Test
+    void fillAndSubmitForm() {
+        driver.findElement(By.id("my-text-id")).sendKeys("Samiksha");
+        driver.findElement(By.name("my-password")).sendKeys("Test@123");
+        driver.findElement(By.name("my-textarea")).sendKeys("Automated form submission using Selenium");
+
+        new Select(driver.findElement(By.name("my-select"))).selectByVisibleText("Two");
+        driver.findElement(By.name("my-date")).sendKeys("11/20/2026");
+
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
+
+        WebElement message = driver.findElement(By.id("message"));
+        assertEquals("Received!", message.getText());
+        assertEquals("Web form - target page", driver.getTitle());
+    }
+
+    @Test
+    void disabledFieldCannotBeEdited() {
+        WebElement disabled = driver.findElement(By.name("my-disabled"));
+        assertFalse(disabled.isEnabled());
+    }
+
+    @AfterEach
+    void tearDown() {
+        driver.quit();
+    }
+}

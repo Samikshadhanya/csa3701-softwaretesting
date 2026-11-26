@@ -1,0 +1,49 @@
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+/*
+ * Experiment 7 - Check whether a number is prime and validate the output
+ * using JUnit assertions (JUnit)
+ */
+class PrimeChecker {
+    static boolean isPrime(int n) {
+        if (n < 2) return false;
+        for (int i = 2; (long) i * i <= n; i++)
+            if (n % i == 0) return false;
+        return true;
+    }
+}
+
+public class PrimeCheckerTest {
+
+    @Test
+    void testSmallestPrime() {
+        assertTrue(PrimeChecker.isPrime(2));
+    }
+
+    @Test
+    void testPrimeNumber() {
+        assertTrue(PrimeChecker.isPrime(97));
+    }
+
+    @Test
+    void testCompositeNumber() {
+        assertFalse(PrimeChecker.isPrime(91));
+    }
+
+    @Test
+    void testZeroAndOne() {
+        assertFalse(PrimeChecker.isPrime(0));
+        assertFalse(PrimeChecker.isPrime(1));
+    }
+
+    @Test
+    void testNegativeNumber() {
+        assertFalse(PrimeChecker.isPrime(-7));
+    }
+
+    @Test
+    void testLargePrime() {
+        assertTrue(PrimeChecker.isPrime(7919));
+    }
+}

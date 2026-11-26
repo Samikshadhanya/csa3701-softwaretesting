@@ -1,0 +1,61 @@
+import org.junit.jupiter.api.*;
+import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+
+/*
+ * Experiment 34 - Test the boundary values of a numeric input field
+ * using Selenium WebDriver (Selenium)
+ * Page under test: a quantity field <input type="number" min="1" max="100">
+ * The browser's own validation (checkValidity) is used to decide valid / invalid.
+ */
+public class NumericBoundaryTest {
+
+    WebDriver driver;
+    static final String PAGE = "data:text/html,"
+            + "<html><body><form id='f'>"
+            + "<label>Quantity (1-100)</label>"
+            + "<input id='qty' type='number' min='1' max='100' required>"
+            + "<button type='submit'>Submit</button>"
+            + "</form></body></html>";
+
+    @BeforeEach
+    void setUp() {
+        driver = new ChromeDriver();
+        driver.get(PAGE);
+    }
+
+    boolean isValid(String value) {
+        WebElement qty = driver.findElement(By.id("qty"));
+        qty.clear();
+        qty.sendKeys(value);
+        return (Boolean) ((JavascriptExecutor) driver)
+                .executeScript("return arguments[0].checkValidity();", qty);
+    }
+
+    @ParameterizedTest(name = "value {0} valid={1}")
+    @CsvSource({
+        "0,   false",   // min - 1
+        "1,   true",    // min
+        "2,   true",    // min + 1
+        "50,  true",    // nominal
+        "99,  true",    // max - 1
+        "100, true",    // max
+        "101, false"    // max + 1
+    })
+    void boundaryValues(String value, boolean expected) {
+        assertEquals(expected, isValid(value));
+    }
+
+    @Test
+    void emptyValueInvalid() {
+        assertFalse(isValid(""));
+    }
+
+    @AfterEach
+    void tearDown() {
+        driver.quit();
+    }
+}

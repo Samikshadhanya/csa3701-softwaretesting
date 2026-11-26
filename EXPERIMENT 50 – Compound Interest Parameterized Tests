@@ -1,0 +1,44 @@
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.*;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+/*
+ * Experiment 50 - Calculate compound interest and validate the output using
+ * JUnit parameterized tests (JUnit)
+ * CI = P * (1 + r/(100*n))^(n*t) - P
+ */
+class CompoundInterest {
+    static double interest(double p, double rate, int years, int timesPerYear) {
+        if (p <= 0 || rate < 0 || years < 0 || timesPerYear <= 0)
+            throw new IllegalArgumentException("Invalid input");
+        double amount = p * Math.pow(1 + rate / (100.0 * timesPerYear), (double) timesPerYear * years);
+        return Math.round((amount - p) * 100) / 100.0;
+    }
+}
+
+public class CompoundInterestTest {
+
+    @ParameterizedTest(name = "P={0}, R={1}%, T={2}y, n={3} -> CI={4}")
+    @CsvSource({
+        "1000,  10, 2, 1,  210.00",
+        "5000,  8,  3, 1,  1298.56",
+        "10000, 12, 1, 12, 1268.25",
+        "2000,  5,  0, 1,  0.00",
+        "1500,  0,  5, 4,  0.00"
+    })
+    void validInputs(double p, double r, int t, int n, double expected) {
+        assertEquals(expected, CompoundInterest.interest(p, r, t, n), 0.01);
+    }
+
+    @ParameterizedTest(name = "invalid principal {0}")
+    @ValueSource(doubles = {0, -100, -5000})
+    void invalidPrincipal(double p) {
+        assertThrows(IllegalArgumentException.class, () -> CompoundInterest.interest(p, 10, 2, 1));
+    }
+
+    @Test
+    void interestIncreasesWithCompoundingFrequency() {
+        assertTrue(CompoundInterest.interest(10000, 12, 1, 12) > CompoundInterest.interest(10000, 12, 1, 1));
+    }
+}
